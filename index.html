@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>词语听说读写</title>
+  <style>
+    :root{
+      --c1:#FF6F61; --c2:#FFB74D; --c3:#4DB6AC; --c4:#64B5F6; --c5:#BA68C8;
+      --bg1:#FFF3E0; --bg2:#E1F5FE;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:"Comic Sans MS","Helvetica Neue",Arial,"PingFang SC",sans-serif;
+      background:linear-gradient(135deg,var(--bg1),var(--bg2),#F3E5F5);
+      min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;
+      overflow-x:hidden;
+    }
+    .wrap{
+      width:100%; max-width:1200px; background:#fff; border-radius:18px;
+      padding:18px; box-shadow:0 12px 40px rgba(0,0,0,0.12); position:relative; z-index:1;
+    }
+    header{display:flex; align-items:center; gap:12px}
+    .logo{width:84px; height:84px; border-radius:18px;
+      background:conic-gradient(from 45deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c5),var(--c1));
+      display:flex; align-items:center; justify-content:center; color:#fff; font-size:40px; font-weight:900;
+      box-shadow:0 8px 26px rgba(0,0,0,0.18)}
+    h1{margin:0; font-size:24px; color:var(--c1)}
+    main{margin-top:14px}
+
+    #home{display:block}
+    .card{background:#fff; border-radius:14px; padding:14px; box-shadow:0 8px 22px rgba(0,0,0,0.06); margin-bottom:14px}
+    .grade-selects{display:flex; gap:12px; flex-wrap:wrap; margin-top:12px}
+    .grade-btn{flex:1; min-width:120px; padding:14px; border-radius:12px; font-weight:900;
+      background:linear-gradient(135deg,var(--c2),var(--c1)); color:#fff; text-align:center; cursor:pointer; transition:.15s}
+    .grade-btn.selected{outline:5px solid #64B5F6; transform:translateY(-4px)}
+    .num-select{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap}
+    .num-btn{padding:10px 14px; border-radius:12px; font-weight:800; cursor:pointer;
+      background:linear-gradient(135deg,var(--c3),var(--c4)); color:#fff}
+    .num-btn.selected{outline:4px solid #FFB74D; transform:scale(1.03)}
+    .custom-box{display:flex; align-items:center; gap:8px; margin-top:10px}
+    .custom-input{width:90px; padding:8px; border:3px solid var(--c4); border-radius:10px; text-align:center; font-weight:700}
+    .start-btn{background:linear-gradient(90deg,var(--c1),var(--c2)); border:none; color:#fff;
+      padding:14px 20px; border-radius:14px; font-weight:900; font-size:16px; cursor:pointer;
+      box-shadow:0 8px 28px rgba(0,0,0,0.18); margin-top:14px}
+
+    #game{display:none; position:relative}
+    .animal-emoji{position:fixed; font-size:40px; opacity:0.5; z-index:0; pointer-events:none}
+    .animal-1{top:6%; left:17%} .animal-2{top:8%; right:12%} .animal-3{bottom:15%; left:5%}
+    .animal-4{bottom:12%; right:8%} .animal-5{top:40%; left:3%} .animal-6{top:55%; right:5%}
+
+    .game-content{display:flex; width:100%; gap:20px; margin:14px 0; position:relative; z-index:1}
+    .char-box{flex:1; text-align:center; padding:10px}
+    .word{display:flex; justify-content:center; gap:10px;}
+    .word-char-container{display:flex; flex-direction:column; align-items:center;}
+    .pinyin-display{font-size:24px; color:#000; margin-bottom:5px;height: 30px; line-height: 30px;}
+    .word-char{font-size:100px; font-weight:900; color:var(--c1); transition: color 0.3s;}
+    .word-char.inactive{color: #ccc;}
+    .meta{font-size:16px; margin-top:6px; color:#333}
+    .play-btn{margin-top:8px; padding:8px 14px; border:none; border-radius:12px;
+      background:linear-gradient(90deg,var(--c3),var(--c4)); color:#fff; font-weight:800; cursor:pointer}
+
+    .choices{flex:1; display:flex; flex-direction:column; gap:12px; margin-top:14px;
+      transition:opacity 0.6s ease}
+    .choice{padding:16px; border-radius:14px; font-weight:900; font-size:22px; cursor:pointer;
+      background:linear-gradient(135deg,#FFFDE7,#FFF9C4); border:3px solid rgba(0,0,0,0.03); transition:.12s;
+      text-align:center}
+    .choice:hover{transform:translateY(-4px)}
+    .choice.correct{background:linear-gradient(135deg,#DCEDC8,#A5D6A7); border-color:#43A047; color:#1B5E20}
+    .choice.wrong{background:linear-gradient(135deg,#FFCDD2,#EF9A9A); border-color:#E53935; color:#B71C1C}
+    .choice.selected{border:3px solid #000;}
+
+    .progress{height:14px; background:#eee; border-radius:8px; overflow:hidden; margin-top:12px}
+    .progress>div{height:100%; width:0%; background:linear-gradient(90deg,var(--c2),var(--c1))}
+    .next-btn{background:linear-gradient(90deg,var(--c4),var(--c5)); border:none; color:#fff; padding:10px 16px;
+      border-radius:12px; font-weight:900; margin-top:12px; cursor:pointer}
+    .home-btn{background:#fff; border:2px dashed var(--c4); padding:8px 12px; border-radius:12px; cursor:pointer; margin-top:12px}
+
+    .rec-row{display:flex; gap:8px; align-items:center; justify-content:center; margin-top:10px}
+    .rec-btn{padding:8px 12px; border-radius:10px; border:none; font-weight:800; cursor:pointer}
+    .rec-indicator{font-size:13px; color:#666; margin-left:6px}
+    .transcript{font-weight:800; padding:6px 8px; border-radius:8px; border:2px solid transparent;
+      margin-left:10px; min-width:160px; text-align:center}
+    .rec-play-wrap{display:flex; flex-direction:column; align-items:center; margin-top:10px}
+
+    /* 新增提示样式 */
+    .stage-indicator {
+      font-size: 16px;
+      font-weight: bold;
+      margin: 10px 0;
+      padding: 8px;
+      border-radius: 8px;
+      background-color: #f0f7ff;
+      color: #1976d2;
+    }
+
+    @media (max-width:760px){
+      .game-content{flex-direction:column}
+      .word-char{font-size:48px}
+      .pinyin-display{font-size:18px;height: 30px; line-height: 30px;}
+    }
+
+    #end{display:none; text-align:center}
+    .end-card{padding:20px; border-radius:16px; background:linear-gradient(135deg,#FFF3E0,#FFE0B2)}
+    .score-big{font-size:36px; font-weight:900; color:var(--c1); margin:10px 0}
+    .encourage{margin-top:12px; font-size:18px; font-weight:900; color:var(--c5)}
+    footer{margin-top:16px; text-align:center; color:#999; font-weight:700}
+
+    /* 奖励动画 */
+    .reward-animation {
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      background:rgba(255,255,255,0.9);
+      z-index:1000;
+      animation:fadeInOut 3s forwards;
+    }
+    .reward-text {
+      font-size:42px;
+      font-weight:900;
+      color:var(--c1);
+      text-shadow:2px 2px 4px rgba(0,0,0,0.2);
+      margin-bottom:20px;
+      animation:bounce 1s infinite alternate;
+    }
+    .reward-emoji {
+      font-size:80px;
+      animation:spin 2s infinite;
+    }
+    @keyframes fadeInOut {
+      0% { opacity:0; }
+      20% { opacity:1; }
+      80% { opacity:1; }
+      100% { opacity:0; visibility:hidden; }
+    }
+    @keyframes bounce {
+      from { transform:scale(1); }
+      to { transform:scale(1.1); }
+    }
+    @keyframes spin {
+      from { transform:rotate(0deg); }
+      to { transform:rotate(360deg); }
+    }
+
+    /* 结算动画 */
+    .celebration {
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      pointer-events:none;
+      z-index:999;
+    }
+    .confetti {
+      position:absolute;
+      width:10px;
+      height:20px;
+      background:var(--c1);
+      top:-20px;
+      animation:fall linear forwards;
+    }
+    .confetti:nth-child(2n) { background:var(--c2); }
+    .confetti:nth-child(3n) { background:var(--c3); }
+    .confetti:nth-child(4n) { background:var(--c4); }
+    .confetti:nth-child(5n) { background:var(--c5); }
+    @keyframes fall {
+      to {
+        transform:translateY(100vh) rotate(360deg);
+        opacity:0;
+      }
+    }
+    .firework {
+      position:absolute;
+      width:5px;
+      height:5px;
+      border-radius:50%;
+      box-shadow:0 0 10px 2px;
+      animation:explode 1s forwards;
+    }
+    @keyframes explode {
+      0% {
+        transform:scale(1);
+        opacity:1;
+      }
+      100% {
+        transform:scale(20);
+        opacity:0;
+      }
+    }
+    .superman {
+      position: fixed;
+      top: 50%;
+      left: -100px;
+      transform: translateY(-50%);
+      font-size: 80px;
+      animation: flyRight 3s forwards;
+      z-index: 1001;
+    }
+    @keyframes flyRight {
+      0% {
+        left: -100px;
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+      }
+      100% {
+        left: 100vw;
+        opacity: 0;
+      }
+    }
+
+    /* 词语选择弹窗样式 */
+    #word-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 18px;
+      padding: 20px;
+      width: 95vw;
+      max-width: 1000px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    .grade-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .word-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      gap: 5px;
+      margin-bottom: 20px;
+    }
+    .word-btn {
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: center;
+      padding: 5px;
+    }
+    .word-btn.selected {
+      background: #FFB74D;
+      color: white;
+    }
+    .select-all-btn {
+      padding: 5px 10px;
+      background: linear-gradient(90deg,var(--c3),var(--c4));
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .modal-footer {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    /* 书写区域 */
+    #writing-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 20px auto;
+    }
+    .writer-div {
+      width: 300px;
+      height: 300px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background: #fff;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
+</head>
+<body>
+  <div class="animal-emoji animal-1">🐰</div>
+  <div class="animal-emoji animal-2">🐯</div>
+  <div class="animal-emoji animal-3">🐵</div>
+  <div class="animal-emoji animal-4">🐶</div>
+  <div class="animal-emoji animal-5">🐦</div>
+  <div class="animal-emoji animal-6">🐘</div>
+
+  <div class="wrap" role="application" aria-label="词语听说读写">
+    <header>
+      <div class="logo">词</div>
+      <h1>词语听说读写</h1>
+    </header>
+
+    <main>
+      <!-- HOME -->
+      <section id="home">
+        <div class="card">
+          <div style="font-weight:900">请选择年级</div>
+          <div class="grade-selects" id="grade-selects">
+            <div class="grade-btn" data-grade="1">一年级<br><span style="font-size:13px;opacity:.9">33词</span></div>
+            <div class="grade-btn" data-grade="2">二年级<br><span style="font-size:13px;opacity:.9">45词</span></div>
+            <div class="grade-btn" data-grade="3">三年级<br><span style="font-size:13px;opacity:.9">64词</span></div>
+            <div class="grade-btn" data-grade="4">四年级<br><span style="font-size:13px;opacity:.9">64词</span></div>
+            <div class="grade-btn" data-grade="5">五年级<br><span style="font-size:13px;opacity:.9">77词</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:900">题目数量</div>
+          <div class="num-select" id="num-select">
+            <div class="num-btn" data-num="10">10</div>
+            <div class="num-btn" data-num="20">20</div>
+            <div class="num-btn" data-num="30">30</div>
+            <div class="num-btn" data-num="40">40</div>
+            <div class="num-btn selected" data-num="all">全部</div>
+          </div>
+          <div class="custom-box">
+            <label for="custom-num" style="font-weight:800">自定义：</label>
+            <input id="custom-num" class="custom-input" type="number" min="1" placeholder="数量">
+            <div style="font-size:13px;color:#666">（超过最大值会自动取最大）</div>
+            <button id="select-words" style="background:linear-gradient(90deg,var(--c4),var(--c5));border:none;color:#fff;padding:8px 12px;border-radius:10px;font-weight:800;cursor:pointer">选择词语</button>
+          </div>
+        </div>
+
+        <button id="start-game" class="start-btn">开始练习</button>
+      </section>
+
+      <!-- GAME -->
+      <section id="game" aria-live="polite">
+        <div class="topbar" style="display:flex;justify-content:space-between;">
+          <div id="game-grade" style="font-weight:900">四年级</div>
+          <div id="q-count" style="font-weight:900">0 / 0</div>
+        </div>
+
+        <!-- 新增阶段提示 -->
+        <div class="stage-indicator" id="stage-indicator">第一阶段：请先朗读词语并录音验证</div>
+
+        <div class="game-content">
+          <div class="char-box">
+            <div id="word-display" class="word"></div>
+            <div id="writing-container" style="display:none;"></div>
+            <div class="meta" id="meta-line">（英文释义）</div>
+            <div style="margin-top:6px">
+              <button id="play-sound" class="play-btn">播放词语发音</button>
+            </div>
+
+            <div class="rec-row">
+              <button id="rec-btn" class="rec-btn" style="background:linear-gradient(90deg,var(--c1),var(--c2));color:#fff">开始录音</button>
+              <button id="stop-rec-btn" class="rec-btn" style="background:linear-gradient(90deg,var(--c3),var(--c4));color:#fff;display:none">停止录音</button>
+              <span id="rec-status" class="rec-indicator">（未录音）</span>
+              <div id="transcript" class="transcript" title="识别结果显示在这里">（识别结果）</div>
+            </div>
+
+            <div class="rec-play-wrap">
+              <audio id="user-rec-audio" controls style="display:none;margin-top:8px"></audio>
+            </div>
+          </div>
+
+          <div class="choices" id="choices"></div>
+        </div>
+
+        <div class="progress"><div id="progress-bar"></div></div>
+        <div id="score-text" style="margin-top:10px;font-weight:900">得分：0</div>
+
+        <div style="display:flex;gap:10px;margin-top:12px;justify-content:center;">
+          <button id="next-btn" class="next-btn" style="display:none">下一题</button>
+          <button id="quit-btn" class="home-btn">结束并返回</button>
+        </div>
+      </section>
+
+      <!-- END -->
+      <section id="end">
+        <div class="end-card">
+          <div style="font-weight:900">本轮完成</div>
+          <div class="score-big" id="final-score">0 / 0</div>
+          <div class="encourage" id="encourage"></div>
+         <!-- 新增：查看本轮词语按钮 -->
+<div style="margin: 24px 0; text-align: center;">
+  <button id="show-this-round-words" class="start-btn">
+    查看本轮词语（共 <span id="this-round-word-count">0</span> 个）
+  </button>
+</div>
+          <div style="margin-top:12px;display:flex;gap:10px;justify-content:center">
+            <button id="retry-btn" class="start-btn">再来一次</button>
+            <button id="back-home-btn" class="home-btn">返回首页</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>快乐学词语 🎈</footer>
+  </div>
+
+  <!-- 词语选择弹窗 -->
+  <div id="word-modal">
+    <div class="modal-content">
+      <div id="grade-sections"></div>
+      <div class="modal-footer">
+        <button id="start-custom" class="start-btn">开始练习</button>
+        <button id="cancel-modal" class="home-btn">取消</button>
+      </div>
+    </div>
+  </div>
+ <!-- 结算页 - 本轮词语查看模态框 -->
+<div id="result-word-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; padding:20px;">
+  <div class="modal-content" style="background:white; border-radius:18px; padding:24px; width:95vw; max-width:900px; max-height:85vh; overflow-y:auto;">
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h2 style="margin:0; color:var(--c1);">本轮练习词语</h2>
+      <button id="close-result-modal" style="background:none; border:none; font-size:28px; cursor:pointer; color:#666;">×</button>
+    </div>
+    
+    <div id="result-word-list" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:12px;"></div>
+    
+    <div style="margin-top:24px; text-align:center;">
+      <button id="close-result-modal-btn" class="home-btn" style="padding:10px 24px;">关闭</button>
+    </div>
+  </div>
+</div>
+  <audio id="audio" preload="auto" style="display:none"></audio>
+
+  <script>
+    let wordCorrectStatus = [];  // 记录每道题是否正确，true=正确，false=错误
+    // 修改：在gradeWords中增加每个字的声母(initial)和韵母(final)信息
+    const gradeWords = {
+  1: [{ word: "一二", pinyin: "yī èr", syllables: [{ char: "一", pinyinBase: "yi", tone: 1, initial: "y", final: "i" }, { char: "二", pinyinBase: "er", tone: 4, initial: "e", final: "er" }], english: "one two" },
+{ word: "三四", pinyin: "sān sì", syllables: [{ char: "三", pinyinBase: "san", tone: 1, initial: "s", final: "an" }, { char: "四", pinyinBase: "si", tone: 4, initial: "s", final: "i" }], english: "three four" },
+{ word: "五六", pinyin: "wǔ liù", syllables: [{ char: "五", pinyinBase: "wu", tone: 3, initial: "w", final: "u" }, { char: "六", pinyinBase: "liu", tone: 4, initial: "l", final: "iu" }], english: "five six" },
+{ word: "七八", pinyin: "qī bā", syllables: [{ char: "七", pinyinBase: "qi", tone: 1, initial: "q", final: "i" }, { char: "八", pinyinBase: "ba", tone: 1, initial: "b", final: "a" }], english: "seven eight" },
+{ word: "九十", pinyin: "jiǔ shí", syllables: [{ char: "九", pinyinBase: "jiu", tone: 3, initial: "j", final: "iu" }, { char: "十", pinyinBase: "shi", tone: 2, initial: "sh", final: "i" }], english: "nine ten" },
+{ word: "上下", pinyin: "shàng xià", syllables: [{ char: "上", pinyinBase: "shang", tone: 4, initial: "sh", final: "ang" }, { char: "下", pinyinBase: "xia", tone: 4, initial: "x", final: "ia" }], english: "up and down" },
+{ word: "大小", pinyin: "dà xiǎo", syllables: [{ char: "大", pinyinBase: "da", tone: 4, initial: "d", final: "a" }, { char: "小", pinyinBase: "xiao", tone: 3, initial: "x", final: "iao" }], english: "big and small" },
+{ word: "不是", pinyin: "bú shì", syllables: [{ char: "不", pinyinBase: "bu", tone: 2, initial: "b", final: "u" }, { char: "是", pinyinBase: "shi", tone: 4, initial: "sh", final: "i" }], english: "no; not" },
+{ word: "坐下", pinyin: "zuò xià", syllables: [{ char: "坐", pinyinBase: "zuo", tone: 4, initial: "z", final: "uo" }, { char: "下", pinyinBase: "xia", tone: 4, initial: "x", final: "ia" }], english: "sit down" },
+{ word: "在", pinyin: "zài", syllables: [{ char: "在", pinyinBase: "zai", tone: 4, initial: "z", final: "ai" }], english: "be; at; in" },
+{ word: "山里", pinyin: "shān lǐ", syllables: [{ char: "山", pinyinBase: "shan", tone: 1, initial: "sh", final: "an" }, { char: "里", pinyinBase: "li", tone: 3, initial: "l", final: "i" }], english: "in the mountain" },
+{ word: "水火", pinyin: "shuǐ huǒ", syllables: [{ char: "水", pinyinBase: "shui", tone: 3, initial: "sh", final: "ui" }, { char: "火", pinyinBase: "huo", tone: 3, initial: "h", final: "uo" }], english: "water and fire" },
+{ word: "人", pinyin: "rén", syllables: [{ char: "人", pinyinBase: "ren", tone: 2, initial: "r", final: "en" }], english: "person; people" },
+{ word: "小马", pinyin: "xiǎo mǎ", syllables: [{ char: "小", pinyinBase: "xiao", tone: 3, initial: "x", final: "iao" }, { char: "马", pinyinBase: "ma", tone: 3, initial: "m", final: "a" }], english: "pony; little horse" },
+{ word: "小牛", pinyin: "xiǎo niú", syllables: [{ char: "小", pinyinBase: "xiao", tone: 3, initial: "x", final: "iao" }, { char: "牛", pinyinBase: "niu", tone: 2, initial: "n", final: "iu" }], english: "calf; little cow" },
+{ word: "小羊", pinyin: "xiǎo yáng", syllables: [{ char: "小", pinyinBase: "xiao", tone: 3, initial: "x", final: "iao" }, { char: "羊", pinyinBase: "yang", tone: 2, initial: "y", final: "ang" }], english: "lamb; little sheep" },
+{ word: "小鸟", pinyin: "xiǎo niǎo", syllables: [{ char: "小", pinyinBase: "xiao", tone: 3, initial: "x", final: "iao" }, { char: "鸟", pinyinBase: "niao", tone: 3, initial: "n", final: "iao" }], english: "bird; little bird" },
+{ word: "虫子", pinyin: "chóng zi", syllables: [{ char: "虫", pinyinBase: "chong", tone: 2, initial: "ch", final: "ong" }, { char: "子", pinyinBase: "zi", tone: 5, initial: "z", final: "i" }], english: "insect; worm" },
+{ word: "男生", pinyin: "nán shēng", syllables: [{ char: "男", pinyinBase: "nan", tone: 2, initial: "n", final: "an" }, { char: "生", pinyinBase: "sheng", tone: 1, initial: "sh", final: "eng" }], english: "boy; schoolboy" },
+{ word: "女生", pinyin: "nǚ shēng", syllables: [{ char: "女", pinyinBase: "nü", tone: 3, initial: "n", final: "ü" }, { char: "生", pinyinBase: "sheng", tone: 1, initial: "sh", final: "eng" }], english: "girl; schoolgirl" },
+{ word: "下雨", pinyin: "xià yǔ", syllables: [{ char: "下", pinyinBase: "xia", tone: 4, initial: "x", final: "ia" }, { char: "雨", pinyinBase: "yu", tone: 3, initial: "y", final: "ü" }], english: "rain; raining" },
+{ word: "土", pinyin: "tǔ", syllables: [{ char: "土", pinyinBase: "tu", tone: 3, initial: "t", final: "u" }], english: "soil; earth; land" },
+{ word: "月亮", pinyin: "yuè liang", syllables: [{ char: "月", pinyinBase: "yue", tone: 4, initial: "y", final: "üe" }, { char: "亮", pinyinBase: "liang", tone: 5, initial: "l", final: "iang" }], english: "moon" },
+{ word: "今天", pinyin: "jīn tiān", syllables: [{ char: "今", pinyinBase: "jin", tone: 1, initial: "j", final: "in" }, { char: "天", pinyinBase: "tian", tone: 1, initial: "t", final: "ian" }], english: "today" },
+{ word: "昨天", pinyin: "zuó tiān", syllables: [{ char: "昨", pinyinBase: "zuo", tone: 2, initial: "z", final: "uo" }, { char: "天", pinyinBase: "tian", tone: 1, initial: "t", final: "ian" }], english: "yesterday" },
+{ word: "明天", pinyin: "míng tiān", syllables: [{ char: "明", pinyinBase: "ming", tone: 2, initial: "m", final: "ing" }, { char: "天", pinyinBase: "tian", tone: 1, initial: "t", final: "ian" }], english: "tomorrow" },
+{ word: "生日", pinyin: "shēng rì", syllables: [{ char: "生", pinyinBase: "sheng", tone: 1, initial: "sh", final: "eng" }, { char: "日", pinyinBase: "ri", tone: 4, initial: "r", final: "i" }], english: "birthday" },
+{ word: "走来走去", pinyin: "zǒu lái zǒu qù", syllables: [{ char: "走", pinyinBase: "zou", tone: 3, initial: "z", final: "ou" }, { char: "来", pinyinBase: "lai", tone: 2, initial: "l", final: "ai" }, { char: "走", pinyinBase: "zou", tone: 3, initial: "z", final: "ou" }, { char: "去", pinyinBase: "qu", tone: 4, initial: "q", final: "ü" }], english: "walk back and forth" },
+{ word: "田里", pinyin: "tián lǐ", syllables: [{ char: "田", pinyinBase: "tian", tone: 2, initial: "t", final: "ian" }, { char: "里", pinyinBase: "li", tone: 3, initial: "l", final: "i" }], english: "in the field" },
+{ word: "星期", pinyin: "xīng qī", syllables: [{ char: "星", pinyinBase: "xing", tone: 1, initial: "x", final: "ing" }, { char: "期", pinyinBase: "qi", tone: 1, initial: "q", final: "i" }], english: "week" },
+{ word: "几天", pinyin: "jǐ tiān", syllables: [{ char: "几", pinyinBase: "ji", tone: 3, initial: "j", final: "i" }, { char: "天", pinyinBase: "tian", tone: 1, initial: "t", final: "ian" }], english: "a few days" },
+{ word: "几年", pinyin: "jǐ nián", syllables: [{ char: "几", pinyinBase: "ji", tone: 3, initial: "j", final: "i" }, { char: "年", pinyinBase: "nian", tone: 2, initial: "n", final: "ian" }], english: "a few years" }],
+  2: [
+    { word: "你好", pinyin: "nǐ hǎo", syllables: [{ char: "你", pinyinBase: "ni", tone: 3, initial: "n", final: "i" }, { char: "好", pinyinBase: "hao", tone: 3, initial: "h", final: "ao" }], english: "hello; hi" },
+{ word: "我们", pinyin: "wǒ men", syllables: [{ char: "我", pinyinBase: "wo", tone: 3, initial: "w", final: "o" }, { char: "们", pinyinBase: "men", tone: 5, initial: "m", final: "en" }], english: "we; us" },
+{ word: "他们", pinyin: "tā men", syllables: [{ char: "他", pinyinBase: "ta", tone: 1, initial: "t", final: "a" }, { char: "们", pinyinBase: "men", tone: 5, initial: "m", final: "en" }], english: "they; them" },
+{ word: "可以", pinyin: "kě yǐ", syllables: [{ char: "可", pinyinBase: "ke", tone: 3, initial: "k", final: "e" }, { char: "以", pinyinBase: "yi", tone: 3, initial: "y", final: "i" }], english: "can; may; be able to" },
+{ word: "朋友", pinyin: "péng you", syllables: [{ char: "朋", pinyinBase: "peng", tone: 2, initial: "p", final: "eng" }, { char: "友", pinyinBase: "you", tone: 5, initial: "y", final: "ou" }], english: "friend" },
+{ word: "我的", pinyin: "wǒ de", syllables: [{ char: "我", pinyinBase: "wo", tone: 3, initial: "w", final: "o" }, { char: "的", pinyinBase: "de", tone: 5, initial: "d", final: "e" }], english: "my; mine" },
+{ word: "哪里", pinyin: "nǎ lǐ", syllables: [{ char: "哪", pinyinBase: "na", tone: 3, initial: "n", final: "a" }, { char: "里", pinyinBase: "li", tone: 3, initial: "l", final: "i" }], english: "where" },
+{ word: "这个", pinyin: "zhè ge", syllables: [{ char: "这", pinyinBase: "zhe", tone: 4, initial: "zh", final: "e" }, { char: "个", pinyinBase: "ge", tone: 5, initial: "g", final: "e" }], english: "this" },
+{ word: "好吗", pinyin: "hǎo ma", syllables: [{ char: "好", pinyinBase: "hao", tone: 3, initial: "h", final: "ao" }, { char: "吗", pinyinBase: "ma", tone: 5, initial: "m", final: "a" }], english: "okay?; all right?" },
+{ word: "要", pinyin: "yào", syllables: [{ char: "要", pinyinBase: " yao", tone: 4, initial: "y", final: "ao" }], english: "want; need; will" },
+{ word: "外面", pinyin: "wài miàn", syllables: [{ char: "外", pinyinBase: "wai", tone: 4, initial: "w", final: "ai" }, { char: "面", pinyinBase: "mian", tone: 4, initial: "m", final: "ian" }], english: "outside; exterior" },
+{ word: "她们", pinyin: "tā men", syllables: [{ char: "她", pinyinBase: "ta", tone: 1, initial: "t", final: "a" }, { char: "们", pinyinBase: "men", tone: 5, initial: "m", final: "en" }], english: "they (feminine); them" },
+{ word: "玩", pinyin: "wán", syllables: [{ char: "玩", pinyinBase: "wan", tone: 2, initial: "w", final: "an" }], english: "play; have fun" },
+{ word: "跟", pinyin: "gēn", syllables: [{ char: "跟", pinyinBase: "gen", tone: 1, initial: "g", final: "en" }], english: "follow; with; heel" },
+{ word: "喜欢", pinyin: "xǐ huan", syllables: [{ char: "喜", pinyinBase: "xi", tone: 3, initial: "x", final: "i" }, { char: "欢", pinyinBase: " huan", tone: 5, initial: "h", final: "uan" }], english: "like; love; be fond of" },
+{ word: "谁", pinyin: "shuí", syllables: [{ char: "谁", pinyinBase: "shui", tone: 2, initial: "sh", final: "ui" }], english: "who; whom" },
+{ word: "吃饭", pinyin: "chī fàn", syllables: [{ char: "吃", pinyinBase: "chi", tone: 1, initial: "ch", final: "i" }, { char: "饭", pinyinBase: "fan", tone: 4, initial: "f", final: "an" }], english: "eat a meal; have dinner" },
+{ word: "很好", pinyin: "hěn hǎo", syllables: [{ char: "很", pinyinBase: "hen", tone: 3, initial: "h", final: "en" }, { char: "好", pinyinBase: "hao", tone: 3, initial: "h", final: "ao" }], english: "very good; fine" },
+{ word: "什么", pinyin: "shén me", syllables: [{ char: "什", pinyinBase: "shen", tone: 2, initial: "sh", final: "en" }, { char: "么", pinyinBase: "me", tone: 5, initial: "m", final: "e" }], english: "what" },
+{ word: "上课", pinyin: "shàng kè", syllables: [{ char: "上", pinyinBase: "shang", tone: 4, initial: "sh", final: "ang" }, { char: "课", pinyinBase: "ke", tone: 4, initial: "k", final: "e" }], english: "attend class; have a lesson" },
+{ word: "看书", pinyin: "kàn shū", syllables: [{ char: "看", pinyinBase: "kan", tone: 4, initial: "k", final: "an" }, { char: "书", pinyinBase: "shu", tone: 1, initial: "sh", final: "u" }], english: "read a book; read" },
+{ word: "老师", pinyin: "lǎo shī", syllables: [{ char: "老", pinyinBase: "lao", tone: 3, initial: "l", final: "ao" }, { char: "师", pinyinBase: "shi", tone: 1, initial: "sh", final: "i" }], english: "teacher" },
+{ word: "因为", pinyin: "yīn wèi", syllables: [{ char: "因", pinyinBase: "yin", tone: 1, initial: "y", final: "in" }, { char: "为", pinyinBase: "wei", tone: 4, initial: "w", final: "ei" }], english: "because; since" },
+{ word: "没有", pinyin: "méi yǒu", syllables: [{ char: "没", pinyinBase: "mei", tone: 2, initial: "m", final: "ei" }, { char: "有", pinyinBase: "you", tone: 3, initial: "y", final: "ou" }], english: "no; not have; without" },
+{ word: "下雪", pinyin: "xià xuě", syllables: [{ char: "下", pinyinBase: "xia", tone: 4, initial: "x", final: "ia" }, { char: "雪", pinyinBase: "xue", tone: 3, initial: "x", final: "üe" }], english: "snow; snowing" },
+{ word: "说话", pinyin: "shuō huà", syllables: [{ char: "说", pinyinBase: "shuo", tone: 1, initial: "sh", final: "uo" }, { char: "话", pinyinBase: "hua", tone: 4, initial: "h", final: "ua" }], english: "speak; talk; say" },
+{ word: "给", pinyin: "gěi", syllables: [{ char: "给", pinyinBase: "gei", tone: 3, initial: "g", final: "ei" }], english: "give; for; to" },
+{ word: "爸妈", pinyin: "bà mā", syllables: [{ char: "爸", pinyinBase: "ba", tone: 4, initial: "b", final: "a" }, { char: "妈", pinyinBase: "ma", tone: 1, initial: "m", final: "a" }], english: "father and mother; parents" },
+{ word: "后面", pinyin: "hòu miàn", syllables: [{ char: "后", pinyinBase: "hou", tone: 4, initial: "h", final: "ou" }, { char: "面", pinyinBase: "mian", tone: 4, initial: "m", final: "ian" }], english: "behind; back; later" },
+{ word: "前面", pinyin: "qián miàn", syllables: [{ char: "前", pinyinBase: "qian", tone: 2, initial: "q", final: "ian" }, { char: "面", pinyinBase: "mian", tone: 4, initial: "m", final: "ian" }], english: "in front; front; ahead" },
+{ word: "对", pinyin: "duì", syllables: [{ char: "对", pinyinBase: "dui", tone: 4, initial: "d", final: "ui" }], english: "right; correct; to" },
+{ word: "学校", pinyin: "xué xiào", syllables: [{ char: "学", pinyinBase: "xue", tone: 2, initial: "x", final: "üe" }, { char: "校", pinyinBase: "xiao", tone: 4, initial: "x", final: "iao" }], english: "school" },
+{ word: "回家", pinyin: "huí jiā", syllables: [{ char: "回", pinyinBase: "hui", tone: 2, initial: "h", final: "ui" }, { char: "家", pinyinBase: "jia", tone: 1, initial: "j", final: "ia" }], english: "go home; return home" },
+{ word: "到", pinyin: "dào", syllables: [{ char: "到", pinyinBase: "dao", tone: 4, initial: "d", final: "ao" }], english: "arrive; reach; to" },
+{ word: "放学", pinyin: "fàng xué", syllables: [{ char: "放", pinyinBase: "fang", tone: 4, initial: "f", final: "ang" }, { char: "学", pinyinBase: "xue", tone: 2, initial: "x", final: "üe" }], english: "finish school; after school" },
+{ word: "怎么", pinyin: "zěn me", syllables: [{ char: "怎", pinyinBase: "zen", tone: 3, initial: "z", final: "en" }, { char: "么", pinyinBase: "me", tone: 5, initial: "m", final: "e" }], english: "how; why; what" },
+{ word: "会", pinyin: "huì", syllables: [{ char: "会", pinyinBase: "hui", tone: 4, initial: "h", final: "ui" }], english: "can; be able to; meeting" },
+{ word: "也", pinyin: "yě", syllables: [{ char: "也", pinyinBase: "ye", tone: 3, initial: "y", final: "e" }], english: "also; too; either" },
+{ word: "帮助", pinyin: "bāng zhù", syllables: [{ char: "帮", pinyinBase: "bang", tone: 1, initial: "b", final: "ang" }, { char: "助", pinyinBase: "zhu", tone: 4, initial: "zh", final: "u" }], english: "help; assist" },
+{ word: "每天", pinyin: "měi tiān", syllables: [{ char: "每", pinyinBase: "mei", tone: 3, initial: "m", final: "ei" }, { char: "天", pinyinBase: "tian", tone: 1, initial: "t", final: "ian" }], english: "every day" },
+{ word: "能", pinyin: "néng", syllables: [{ char: "能", pinyinBase: "neng", tone: 2, initial: "n", final: "eng" }], english: "can; be able to; energy" },
+{ word: "几岁", pinyin: "jǐ suì", syllables: [{ char: "几", pinyinBase: "ji", tone: 3, initial: "j", final: "i" }, { char: "岁", pinyinBase: "sui", tone: 4, initial: "s", final: "ui" }], english: "how old" },
+{ word: "时候", pinyin: "shí hou", syllables: [{ char: "时", pinyinBase: "shi", tone: 2, initial: "sh", final: "i" }, { char: "候", pinyinBase: "hou", tone: 5, initial: "h", final: "ou" }], english: "time; moment; when" },
+{ word: "快乐", pinyin: "kuài lè", syllables: [{ char: "快", pinyinBase: "kuai", tone: 4, initial: "k", final: "uai" }, { char: "乐", pinyinBase: "le", tone: 4, initial: "l", final: "e" }], english: "happy; joyful; cheerful" },
+{ word: "高兴", pinyin: "gāo xìng", syllables: [{ char: "高", pinyinBase: "gao", tone: 1, initial: "g", final: "ao" }, { char: "兴", pinyinBase: "xing", tone: 4, initial: "x", final: "ing" }], english: "happy; glad; pleased" }
+  ],
+  3: [
+    { word: "姐姐", pinyin: "jiě jie", syllables: [{ char: "姐", pinyinBase: "jie", tone: 3, initial: "j", final: "ie" }, { char: "姐", pinyinBase: "jie", tone: 5, initial: "j", final: "ie" }], english: "elder sister" },
+{ word: "妹妹", pinyin: "mèi mei", syllables: [{ char: "妹", pinyinBase: "mei", tone: 4, initial: "m", final: "ei" }, { char: "妹", pinyinBase: "mei", tone: 5, initial: "m", final: "ei" }], english: "younger sister" },
+{ word: "长大", pinyin: "zhǎng dà", syllables: [{ char: "长", pinyinBase: "zhang", tone: 3, initial: "zh", final: "ang" }, { char: "大", pinyinBase: "da", tone: 4, initial: "d", final: "a" }], english: "grow up; become an adult" },
+{ word: "爱心", pinyin: "ài xīn", syllables: [{ char: "爱", pinyinBase: "ai", tone: 4, initial: "a", final: "ai" }, { char: "心", pinyinBase: "xin", tone: 1, initial: "x", final: "in" }], english: "compassion; loving heart" },
+{ word: "想要", pinyin: "xiǎng yào", syllables: [{ char: "想", pinyinBase: "xiang", tone: 3, initial: "x", final: "iang" }, { char: "要", pinyinBase: "yao", tone: 4, initial: "y", final: "ao" }], english: "want; would like to" },
+{ word: "一样", pinyin: "yī yàng", syllables: [{ char: "一", pinyinBase: "yi", tone: 1, initial: "y", final: "i" }, { char: "样", pinyinBase: "yang", tone: 4, initial: "y", final: "ang" }], english: "the same; alike" },
+{ word: "哥哥", pinyin: "gē ge", syllables: [{ char: "哥", pinyinBase: "ge", tone: 1, initial: "g", final: "e" }, { char: "哥", pinyinBase: "ge", tone: 5, initial: "g", final: "e" }], english: "elder brother" },
+{ word: "弟弟", pinyin: "dì di", syllables: [{ char: "弟", pinyinBase: "di", tone: 4, initial: "d", final: "i" }, { char: "弟", pinyinBase: "di", tone: 5, initial: "d", final: "i" }], english: "younger brother" },
+{ word: "都", pinyin: "dōu", syllables: [{ char: "都", pinyinBase: "dou", tone: 1, initial: "d", final: "ou" }], english: "all; both" },
+{ word: "太", pinyin: "tài", syllables: [{ char: "太", pinyinBase: "tai", tone: 4, initial: "t", final: "ai" }], english: "too; very; too much" },
+{ word: "两个", pinyin: "liǎng gè", syllables: [{ char: "两", pinyinBase: "liang", tone: 3, initial: "l", final: "iang" }, { char: "个", pinyinBase: "ge", tone: 5, initial: "g", final: "e" }], english: "two; both" },
+{ word: "和", pinyin: "hé", syllables: [{ char: "和", pinyinBase: "he", tone: 2, initial: "h", final: "e" }], english: "and; with; harmonious" },
+{ word: "叫", pinyin: "jiào", syllables: [{ char: "叫", pinyinBase: "jiao", tone: 4, initial: "j", final: "iao" }], english: "call; shout; name" },
+{ word: "出去", pinyin: "chū qù", syllables: [{ char: "出", pinyinBase: "chu", tone: 1, initial: "ch", final: "u" }, { char: "去", pinyinBase: "qu", tone: 4, initial: "q", final: "ü" }], english: "go out; exit" },
+{ word: "进来", pinyin: "jìn lái", syllables: [{ char: "进", pinyinBase: "jin", tone: 4, initial: "j", final: "in" }, { char: "来", pinyinBase: "lai", tone: 2, initial: "l", final: "ai" }], english: "come in; enter" },
+{ word: "再见", pinyin: "zài jiàn", syllables: [{ char: "再", pinyinBase: "zai", tone: 4, initial: "z", final: "ai" }, { char: "见", pinyinBase: "jian", tone: 4, initial: "j", final: "ian" }], english: "goodbye; see you again" },
+{ word: "中国", pinyin: "zhōng guó", syllables: [{ char: "中", pinyinBase: " zhong", tone: 1, initial: "zh", final: "ong" }, { char: "国", pinyinBase: "guo", tone: 2, initial: "g", final: "uo" }], english: "China" },
+{ word: "一起", pinyin: "yì qǐ", syllables: [{ char: "一", pinyinBase: "yi", tone: 4, initial: "y", final: "i" }, { char: "起", pinyinBase: "qi", tone: 3, initial: "q", final: "i" }], english: "together; in one go" },
+{ word: "美国", pinyin: "měi guó", syllables: [{ char: "美", pinyinBase: "mei", tone: 3, initial: "m", final: "ei" }, { char: "国", pinyinBase: "guo", tone: 2, initial: "g", final: "uo" }], english: "America; the United States" },
+{ word: "写字", pinyin: "xiě zì", syllables: [{ char: "写", pinyinBase: "xie", tone: 3, initial: "x", final: "ie" }, { char: "字", pinyinBase: "zi", tone: 4, initial: "z", final: "i" }], english: "write characters; write" },
+{ word: "用", pinyin: "yòng", syllables: [{ char: "用", pinyinBase: " yong", tone: 4, initial: "y", final: "ong" }], english: "use; employ; by" },
+{ word: "多少", pinyin: "duō shǎo", syllables: [{ char: "多", pinyinBase: "duo", tone: 1, initial: "d", final: "uo" }, { char: "少", pinyinBase: "shao", tone: 3, initial: "sh", final: "ao" }], english: "how many; how much; more or less" },
+{ word: "谢谢", pinyin: "xiè xie", syllables: [{ char: "谢", pinyinBase: "xie", tone: 4, initial: "x", final: "ie" }, { char: "谢", pinyinBase: "xie", tone: 5, initial: "x", final: "ie" }], english: "thank you; thanks" },
+{ word: "一点", pinyin: "yī diǎn", syllables: [{ char: "一", pinyinBase: "yi", tone: 1, initial: "y", final: "i" }, { char: "点", pinyinBase: "dian", tone: 3, initial: "d", final: "ian" }], english: "a little; a bit; some" },
+{ word: "东西", pinyin: "dōng xi", syllables: [{ char: "东", pinyinBase: "dong", tone: 1, initial: "d", final: "ong" }, { char: "西", pinyinBase: "xi", tone: 5, initial: "x", final: "i" }], english: "thing; object; east and west" },
+{ word: "一边", pinyin: "yī biān", syllables: [{ char: "一", pinyinBase: "yi", tone: 1, initial: "y", final: "i" }, { char: "边", pinyinBase: "bian", tone: 1, initial: "b", final: "ian" }], english: "one side; while; at the same time" },
+{ word: "就", pinyin: "jiù", syllables: [{ char: "就", pinyinBase: " jiu", tone: 4, initial: "j", final: "iu" }], english: "just; then; at once" },
+{ word: "如果", pinyin: "rú guǒ", syllables: [{ char: "如", pinyinBase: "ru", tone: 2, initial: "r", final: "u" }, { char: "果", pinyinBase: "guo", tone: 3, initial: "g", final: "uo" }], english: "if; in case" },
+{ word: "还", pinyin: "hái", syllables: [{ char: "还", pinyinBase: "hai", tone: 2, initial: "h", final: "ai" }], english: "still; also; yet" },
+{ word: "所以", pinyin: "suǒ yǐ", syllables: [{ char: "所", pinyinBase: "suo", tone: 3, initial: "s", final: "uo" }, { char: "以", pinyinBase: "yi", tone: 3, initial: "y", final: "i" }], english: "so; therefore; hence" },
+{ word: "那里", pinyin: "nà lǐ", syllables: [{ char: "那", pinyinBase: "na", tone: 4, initial: "n", final: "a" }, { char: "里", pinyinBase: "li", tone: 3, initial: "l", final: "i" }], english: "there; that place" },
+{ word: "地方", pinyin: "dì fāng", syllables: [{ char: "地", pinyinBase: "di", tone: 4, initial: "d", final: "i" }, { char: "方", pinyinBase: "fang", tone: 1, initial: "f", final: "ang" }], english: "place; area; local" },
+{ word: "夏天", pinyin: "xià tiān", syllables: [{ char: "夏", pinyinBase: "xia", tone: 4, initial: "x", final: "ia" }, { char: "天", pinyinBase: "tian", tone: 1, initial: "t", final: "ian" }], english: "summer" },
+{ word: "冷热", pinyin: "lěng rè", syllables: [{ char: "冷", pinyinBase: "leng", tone: 3, initial: "l", final: "eng" }, { char: "热", pinyinBase: "re", tone: 4, initial: "r", final: "e" }], english: "cold and hot; temperature" },
+{ word: "太阳", pinyin: "tài yáng", syllables: [{ char: "太", pinyinBase: "tai", tone: 4, initial: "t", final: "ai" }, { char: "阳", pinyinBase: "yang", tone: 2, initial: "y", final: "ang" }], english: "sun; the sun" },
+{ word: "比", pinyin: "bǐ", syllables: [{ char: "比", pinyinBase: "bi", tone: 3, initial: "b", final: "i" }], english: "compare; than; ratio" },
+{ word: "假的", pinyin: "jiǎ de", syllables: [{ char: "假", pinyinBase: "jia", tone: 3, initial: "j", final: "ia" }, { char: "的", pinyinBase: "de", tone: 5, initial: "d", final: "e" }], english: "fake; false; artificial" },
+{ word: "做饭", pinyin: "zuò fàn", syllables: [{ char: "做", pinyinBase: "zuo", tone: 4, initial: "z", final: "uo" }, { char: "饭", pinyinBase: "fan", tone: 4, initial: "f", final: "an" }], english: "cook meals; make food" },
+{ word: "过去", pinyin: "guò qù", syllables: [{ char: "过", pinyinBase: "guo", tone: 4, initial: "g", final: "uo" }, { char: "去", pinyinBase: "qu", tone: 4, initial: "q", final: "ü" }], english: "past; go over; pass by" },
+{ word: "得到", pinyin: "dé dào", syllables: [{ char: "得", pinyinBase: "de", tone: 2, initial: "d", final: "e" }, { char: "到", pinyinBase: "dao", tone: 4, initial: "d", final: "ao" }], english: "get; obtain; receive" },
+{ word: "送给", pinyin: "sòng gěi", syllables: [{ char: "送", pinyinBase: "song", tone: 4, initial: "s", final: "ong" }, { char: "给", pinyinBase: "gei", tone: 3, initial: "g", final: "ei" }], english: "give as a present; send to" },
+{ word: "住", pinyin: "zhù", syllables: [{ char: "住", pinyinBase: "zhu", tone: 4, initial: "zh", final: "u" }], english: "live; dwell; stop" },
+{ word: "自己", pinyin: "zì jǐ", syllables: [{ char: "自", pinyinBase: "zi", tone: 4, initial: "z", final: "i" }, { char: "己", pinyinBase: "ji", tone: 3, initial: "j", final: "i" }], english: "oneself; self; my own" },
+{ word: "爷爷", pinyin: "yé ye", syllables: [{ char: "爷", pinyinBase: "ye", tone: 2, initial: "y", final: "e" }, { char: "爷", pinyinBase: "ye", tone: 5, initial: "y", final: "e" }], english: "grandfather; grandpa" },
+{ word: "奶奶", pinyin: "nǎi nai", syllables: [{ char: "奶", pinyinBase: "nai", tone: 3, initial: "n", final: "ai" }, { char: "奶", pinyinBase: "nai", tone: 5, initial: "n", final: "ai" }], english: "grandmother; grandma" },
+{ word: "房子", pinyin: "fáng zi", syllables: [{ char: "房", pinyinBase: "fang", tone: 2, initial: "f", final: "ang" }, { char: "子", pinyinBase: "zi", tone: 5, initial: "z", final: "i" }], english: "house; building; room" },
+{ word: "加", pinyin: "jiā", syllables: [{ char: "加", pinyinBase: "jia", tone: 1, initial: "j", final: "ia" }], english: "add; plus; increase" },
+{ word: "秋天", pinyin: "qiū tiān", syllables: [{ char: "秋", pinyinBase: "qiu", tone: 1, initial: "q", final: "iu" }, { char: "天", pinyinBase: "tian", tone: 1, initial: "t", final: "ian" }], english: "autumn; fall" },
+{ word: "等于", pinyin: "děng yú", syllables: [{ char: "等", pinyinBase: "deng", tone: 3, initial: "d", final: "eng" }, { char: "于", pinyinBase: "yu", tone: 2, initial: "y", final: "ü" }], english: "equal; be equal to; amount to" },
+{ word: "喝水", pinyin: "hē shuǐ", syllables: [{ char: "喝", pinyinBase: "he", tone: 1, initial: "h", final: "e" }, { char: "水", pinyinBase: "shui", tone: 3, initial: "sh", final: "ui" }], english: "drink water; have a drink" },
+{ word: "知道", pinyin: "zhī dào", syllables: [{ char: "知", pinyinBase: "zhi", tone: 1, initial: "zh", final: "i" }, { char: "道", pinyinBase: "dao", tone: 4, initial: "d", final: "ao" }], english: "know; realize; be aware of" },
+{ word: "早上", pinyin: "zǎo shang", syllables: [{ char: "早", pinyinBase: "zao", tone: 3, initial: "z", final: "ao" }, { char: "上", pinyinBase: "shang", tone: 5, initial: "sh", final: "ang" }], english: "morning; early morning" },
+{ word: "中午", pinyin: "zhōng wǔ", syllables: [{ char: "中", pinyinBase: "zhong", tone: 1, initial: "zh", final: "ong" }, { char: "午", pinyinBase: "wu", tone: 3, initial: "w", final: "u" }], english: "noon; midday; lunchtime" },
+{ word: "晚上", pinyin: "wǎn shang", syllables: [{ char: "晚", pinyinBase: "wan", tone: 3, initial: "w", final: "an" }, { char: "上", pinyinBase: "shang", tone: 5, initial: "sh", final: "ang" }], english: "evening; night; tonight" },
+{ word: "着", pinyin: "zhe", syllables: [{ char: "着", pinyinBase: "zhe", tone: 5, initial: "zh", final: "e" }], english: "particle for continuous tense" },
+{ word: "很累", pinyin: "hěn lèi", syllables: [{ char: "很", pinyinBase: "hen", tone: 3, initial: "h", final: "en" }, { char: "累", pinyinBase: "lei", tone: 4, initial: "l", final: "ei" }], english: "very tired; exhausted" },
+{ word: "睡觉", pinyin: "shuì jiào", syllables: [{ char: "睡", pinyinBase: "shui", tone: 4, initial: "sh", final: "ui" }, { char: "觉", pinyinBase: "jiao", tone: 4, initial: "j", final: "iao" }], english: "sleep; go to bed" },
+{ word: "床上", pinyin: "chuáng shang", syllables: [{ char: "床", pinyinBase: "chuang", tone: 2, initial: "ch", final: "uang" }, { char: "上", pinyinBase: "shang", tone: 5, initial: "sh", final: "ang" }], english: "on the bed; in bed" },
+{ word: "画画", pinyin: "huà huà", syllables: [{ char: "画", pinyinBase: "hua", tone: 4, initial: "h", final: "ua" }, { char: "画", pinyinBase: "hua", tone: 5, initial: "h", final: "ua" }], english: "draw; paint; draw a picture" },
+{ word: "红色", pinyin: "hóng sè", syllables: [{ char: "红", pinyinBase: "hong", tone: 2, initial: "h", final: "ong" }, { char: "色", pinyinBase: "se", tone: 4, initial: "s", final: "e" }], english: "red; red color" },
+{ word: "白云", pinyin: "bái yún", syllables: [{ char: "白", pinyinBase: "bai", tone: 2, initial: "b", final: "ai" }, { char: "云", pinyinBase: "yun", tone: 2, initial: "y", final: "ün" }], english: "white cloud; white clouds" },
+{ word: "把", pinyin: "bǎ", syllables: [{ char: "把", pinyinBase: "ba", tone: 3, initial: "b", final: "a" }], english: "hold; grasp; preposition" },
+{ word: "拿走", pinyin: "ná zǒu", syllables: [{ char: "拿", pinyinBase: "na", tone: 2, initial: "n", final: "a" }, { char: "走", pinyinBase: "zou", tone: 3, initial: "z", final: "ou" }], english: "take away; carry off" },
+{ word: "又", pinyin: "yòu", syllables: [{ char: "又", pinyinBase: "you", tone: 4, initial: "y", final: "ou" }], english: "again; also; and" }
+  ],
+  4: [
+    { word: "买东西", pinyin: "mǎi dōng xi", syllables: [{ char: "买", pinyinBase: "mai", tone: 3, initial: "m", final: "ai" }, { char: "东", pinyinBase: "dong", tone: 1, initial: "d", final: "ong" }, { char: "西", pinyinBase: "xi", tone: 5, initial: "x", final: "i" }], english: "buy things; go shopping" },
+{ word: "一块钱", pinyin: "yī kuài qián", syllables: [{ char: "一", pinyinBase: "yi", tone: 1, initial: "y", final: "i" }, { char: "块", pinyinBase: "kuai", tone: 4, initial: "k", final: "uai" }, { char: "钱", pinyinBase: "qian", tone: 2, initial: "q", final: "ian" }], english: "one yuan; a buck" },
+{ word: "一百", pinyin: "yī bǎi", syllables: [{ char: "一", pinyinBase: "yi", tone: 1, initial: "y", final: "i" }, { char: "百", pinyinBase: "bai", tone: 3, initial: "b", final: "ai" }], english: "one hundred" },
+{ word: "数一数", pinyin: "shǔ yī shǔ", syllables: [{ char: "数", pinyinBase: "shu", tone: 3, initial: "sh", final: "u" }, { char: "一", pinyinBase: "yi", tone: 1, initial: "y", final: "i" }, { char: "数", pinyinBase: "shu", tone: 3, initial: "sh", final: "u" }], english: "count; have a count" },
+{ word: "找", pinyin: "zhǎo", syllables: [{ char: "找", pinyinBase: "zhao", tone: 3, initial: "zh", final: "ao" }], english: "look for; find; seek" },
+{ word: "真假", pinyin: "zhēn jiǎ", syllables: [{ char: "真", pinyinBase: "zhen", tone: 1, initial: "zh", final: "en" }, { char: "假", pinyinBase: "jia", tone: 3, initial: "j", final: "ia" }], english: "true and false; genuine and fake" },
+{ word: "现在", pinyin: "xiàn zài", syllables: [{ char: "现", pinyinBase: "xian", tone: 4, initial: "x", final: "ian" }, { char: "在", pinyinBase: "zai", tone: 4, initial: "z", final: "ai" }], english: "now; at present" },
+{ word: "请问", pinyin: "qǐng wèn", syllables: [{ char: "请", pinyinBase: "qing", tone: 3, initial: "q", final: "ing" }, { char: "问", pinyinBase: "wen", tone: 4, initial: "w", final: "en" }], english: "excuse me; may I ask" },
+{ word: "从近到远", pinyin: "cóng jìn dào yuǎn", syllables: [{ char: "从", pinyinBase: "cong", tone: 2, initial: "c", final: "ong" }, { char: "近", pinyinBase: "jin", tone: 4, initial: "j", final: "in" }, { char: "到", pinyinBase: "dao", tone: 4, initial: "d", final: "ao" }, { char: "远", pinyinBase: "yuan", tone: 3, initial: "y", final: "üan" }], english: "from near to far" },
+{ word: "旁边", pinyin: "páng biān", syllables: [{ char: "旁", pinyinBase: "pang", tone: 2, initial: "p", final: "ang" }, { char: "边", pinyinBase: "bian", tone: 1, initial: "b", final: "ian" }], english: "side; beside; nearby" },
+{ word: "公园", pinyin: "gōng yuán", syllables: [{ char: "公", pinyinBase: "gong", tone: 1, initial: "g", final: "ong" }, { char: "园", pinyinBase: "yuan", tone: 2, initial: "y", final: "üan" }], english: "park" },
+{ word: "只", pinyin: "zhī", syllables: [{ char: "只", pinyinBase: "zhi", tone: 1, initial: "zh", final: "i" }], english: "only; just; a measure word" },
+{ word: "自行车", pinyin: "zì xíng chē", syllables: [{ char: "自", pinyinBase: "zi", tone: 4, initial: "z", final: "i" }, { char: "行", pinyinBase: "xing", tone: 2, initial: "x", final: "ing" }, { char: "车", pinyinBase: "che", tone: 1, initial: "ch", final: "e" }], english: "bicycle; bike" },
+{ word: "飞机", pinyin: "fēi jī", syllables: [{ char: "飞", pinyinBase: "fei", tone: 1, initial: "f", final: "ei" }, { char: "机", pinyinBase: "ji", tone: 1, initial: "j", final: "i" }], english: "plane; airplane" },
+{ word: "跑步", pinyin: "pǎo bù", syllables: [{ char: "跑", pinyinBase: "pao", tone: 3, initial: "p", final: "ao" }, { char: "步", pinyinBase: "bu", tone: 4, initial: "b", final: "u" }], english: "run; jog" },
+{ word: "最慢", pinyin: "zuì màn", syllables: [{ char: "最", pinyinBase: "zui", tone: 4, initial: "z", final: "ui" }, { char: "慢", pinyinBase: "man", tone: 4, initial: "m", final: "an" }], english: "the slowest" },
+{ word: "更加", pinyin: "gèng jiā", syllables: [{ char: "更", pinyinBase: "geng", tone: 4, initial: "g", final: "eng" }, { char: "加", pinyinBase: "jia", tone: 1, initial: "j", final: "ia" }], english: "more; even more" },
+{ word: "打球", pinyin: "dǎ qiú", syllables: [{ char: "打", pinyinBase: "da", tone: 3, initial: "d", final: "a" }, { char: "球", pinyinBase: " qiu", tone: 2, initial: "q", final: "iu" }], english: "play ball games; play tennis/basketball" },
+{ word: "几次", pinyin: "jǐ cì", syllables: [{ char: "几", pinyinBase: "ji", tone: 3, initial: "j", final: "i" }, { char: "次", pinyinBase: "ci", tone: 4, initial: "c", final: "i" }], english: "several times; a few times" },
+{ word: "分钟", pinyin: "fēn zhōng", syllables: [{ char: "分", pinyinBase: "fen", tone: 1, initial: "f", final: "en" }, { char: "钟", pinyinBase: " zhong", tone: 1, initial: "zh", final: "ong" }], english: "minute" },
+{ word: "当然", pinyin: "dāng rán", syllables: [{ char: "当", pinyinBase: "dang", tone: 1, initial: "d", final: "ang" }, { char: "然", pinyinBase: "ran", tone: 2, initial: "r", final: "an" }], english: "certainly; of course" },
+{ word: "非常", pinyin: "fēi cháng", syllables: [{ char: "非", pinyinBase: "fei", tone: 1, initial: "f", final: "ei" }, { char: "常", pinyinBase: "chang", tone: 2, initial: "ch", final: "ang" }], english: "very; extremely" },
+{ word: "冬天", pinyin: "dōng tiān", syllables: [{ char: "冬", pinyinBase: "dong", tone: 1, initial: "d", final: "ong" }, { char: "天", pinyinBase: "tian", tone: 1, initial: "t", final: "ian" }], english: "winter" },
+{ word: "第一", pinyin: "dì yī", syllables: [{ char: "第", pinyinBase: "di", tone: 4, initial: "d", final: "i" }, { char: "一", pinyinBase: "yi", tone: 1, initial: "y", final: "i" }], english: "first; the first" },
+{ word: "公民", pinyin: "gōng mín", syllables: [{ char: "公", pinyinBase: "gong", tone: 1, initial: "g", final: "ong" }, { char: "民", pinyinBase: "min", tone: 2, initial: "m", final: "in" }], english: "citizen" },
+{ word: "收衣服", pinyin: "shōu yī fu", syllables: [{ char: "收", pinyinBase: "shou", tone: 1, initial: "sh", final: "ou" }, { char: "衣", pinyinBase: "yi", tone: 1, initial: "y", final: "i" }, { char: "服", pinyinBase: "fu", tone: 5, initial: "f", final: "u" }], english: "collect the clothes" },
+{ word: "河水", pinyin: "hé shuǐ", syllables: [{ char: "河", pinyinBase: "he", tone: 2, initial: "h", final: "e" }, { char: "水", pinyinBase: "shui", tone: 3, initial: "sh", final: "ui" }], english: "river water; river" },
+{ word: "狗", pinyin: "gǒu", syllables: [{ char: "狗", pinyinBase: "gou", tone: 3, initial: "g", final: "ou" }], english: "dog" },
+{ word: "帮助", pinyin: "bāng zhù", syllables: [{ char: "帮", pinyinBase: "bang", tone: 1, initial: "b", final: "ang" }, { char: "助", pinyinBase: "zhu", tone: 4, initial: "zh", final: "u" }], english: "help; assist" },
+{ word: "网子", pinyin: "wǎng zi", syllables: [{ char: "网", pinyinBase: "wang", tone: 3, initial: "w", final: "ang" }, { char: "子", pinyinBase: "zi", tone: 5, initial: "z", final: "i" }], english: "net; a small net" },
+{ word: "它们", pinyin: "tā men", syllables: [{ char: "它", pinyinBase: "ta", tone: 1, initial: "t", final: "a" }, { char: "们", pinyinBase: "men", tone: 5, initial: "m", final: "en" }], english: "they; them (for things/animals)" },
+{ word: "春节", pinyin: "chūn jié", syllables: [{ char: "春", pinyinBase: "chun", tone: 1, initial: "ch", final: "un" }, { char: "节", pinyinBase: "jie", tone: 2, initial: "j", final: "ie" }], english: "Spring Festival; Chinese New Year" },
+{ word: "书包", pinyin: "shū bāo", syllables: [{ char: "书", pinyinBase: "shu", tone: 1, initial: "sh", final: "u" }, { char: "包", pinyinBase: "bao", tone: 1, initial: "b", final: "ao" }], english: "schoolbag; backpack" },
+{ word: "孩子", pinyin: "hái zi", syllables: [{ char: "孩", pinyinBase: "hai", tone: 2, initial: "h", final: "ai" }, { char: "子", pinyinBase: "zi", tone: 5, initial: "z", final: "i" }], english: "child; kids" },
+{ word: "新年", pinyin: "xīn nián", syllables: [{ char: "新", pinyinBase: "xin", tone: 1, initial: "x", final: "in" }, { char: "年", pinyinBase: "nian", tone: 2, initial: "n", final: "ian" }], english: "New Year" },
+{ word: "门口", pinyin: "mén kǒu", syllables: [{ char: "门", pinyinBase: "men", tone: 2, initial: "m", final: "en" }, { char: "口", pinyinBase: "kou", tone: 3, initial: "k", final: "ou" }], english: "doorway; entrance" },
+{ word: "穿衣", pinyin: "chuān yī", syllables: [{ char: "穿", pinyinBase: "chuan", tone: 1, initial: "ch", final: "uan" }, { char: "衣", pinyinBase: "yi", tone: 1, initial: "y", final: "i" }], english: "wear clothes; get dressed" },
+{ word: "举手", pinyin: "jǔ shǒu", syllables: [{ char: "举", pinyinBase: "ju", tone: 3, initial: "j", final: "ü" }, { char: "手", pinyinBase: "shou", tone: 3, initial: "sh", final: "ou" }], english: "raise one's hand" },
+{ word: "听话", pinyin: "tīng huà", syllables: [{ char: "听", pinyinBase: "ting", tone: 1, initial: "t", final: "ing" }, { char: "话", pinyinBase: "hua", tone: 4, initial: "h", final: "ua" }], english: "obey; listen to others" },
+{ word: "忘记", pinyin: "wàng jì", syllables: [{ char: "忘", pinyinBase: "wang", tone: 4, initial: "w", final: "ang" }, { char: "记", pinyinBase: "ji", tone: 4, initial: "j", final: "i" }], english: "forget; leave behind" },
+{ word: "回答", pinyin: "huí dá", syllables: [{ char: "回", pinyinBase: "hui", tone: 2, initial: "h", final: "ui" }, { char: "答", pinyinBase: "da", tone: 2, initial: "d", final: "a" }], english: "answer; reply" },
+{ word: "教室", pinyin: "jiào shì", syllables: [{ char: "教", pinyinBase: "jiao", tone: 4, initial: "j", final: "iao" }, { char: "室", pinyinBase: "shi", tone: 4, initial: "sh", final: "i" }], english: "classroom; schoolroom" },
+{ word: "年级", pinyin: "nián jí", syllables: [{ char: "年", pinyinBase: "nian", tone: 2, initial: "n", final: "ian" }, { char: "级", pinyinBase: "ji", tone: 2, initial: "j", final: "i" }], english: "grade; year level" },
+{ word: "手机", pinyin: "shǒu jī", syllables: [{ char: "手", pinyinBase: "shou", tone: 3, initial: "sh", final: "ou" }, { char: "机", pinyinBase: "ji", tone: 1, initial: "j", final: "i" }], english: "mobile phone; cellphone" },
+{ word: "饭店", pinyin: "fàn diàn", syllables: [{ char: "饭", pinyinBase: "fan", tone: 4, initial: "f", final: "an" }, { char: "店", pinyinBase: "dian", tone: 4, initial: "d", final: "ian" }], english: "restaurant; hotel" },
+{ word: "开关", pinyin: "kāi guān", syllables: [{ char: "开", pinyinBase: "kai", tone: 1, initial: "k", final: "ai" }, { char: "关", pinyinBase: "guan", tone: 1, initial: "g", final: "uan" }], english: "switch; on and off" },
+{ word: "选午饭", pinyin: "xuǎn wǔ fàn", syllables: [{ char: "选", pinyinBase: "xuan", tone: 3, initial: "x", final: "üan" }, { char: "午", pinyinBase: "wu", tone: 3, initial: "w", final: "u" }, { char: "饭", pinyinBase: "fan", tone: 4, initial: "f", final: "an" }], english: "choose lunch" },
+{ word: "让", pinyin: "ràng", syllables: [{ char: "让", pinyinBase: "rang", tone: 4, initial: "r", final: "ang" }], english: "let; allow; yield" },
+{ word: "别人", pinyin: "bié rén", syllables: [{ char: "别", pinyinBase: "bie", tone: 2, initial: "b", final: "ie" }, { char: "人", pinyinBase: "ren", tone: 2, initial: "r", final: "en" }], english: "others; other people" },
+{ word: "一些", pinyin: "yī xiē", syllables: [{ char: "一", pinyinBase: "yi", tone: 1, initial: "y", final: "i" }, { char: "些", pinyinBase: "xie", tone: 1, initial: "x", final: "ie" }], english: "some; a few" },
+{ word: "先后", pinyin: "xiān hòu", syllables: [{ char: "先", pinyinBase: "xian", tone: 1, initial: "x", final: "ian" }, { char: "后", pinyinBase: "hou", tone: 4, initial: "h", final: "ou" }], english: "successively; first and then" },
+{ word: "然后", pinyin: "rán hòu", syllables: [{ char: "然", pinyinBase: "ran", tone: 2, initial: "r", final: "an" }, { char: "后", pinyinBase: "hou", tone: 4, initial: "h", final: "ou" }], english: "then; after that" },
+{ word: "大笑", pinyin: "dà xiào", syllables: [{ char: "大", pinyinBase: "da", tone: 4, initial: "d", final: "a" }, { char: "笑", pinyinBase: "xiao", tone: 4, initial: "x", final: "iao" }], english: "laugh loudly; burst into laughter" },
+{ word: "大哭", pinyin: "dà kū", syllables: [{ char: "大", pinyinBase: "da", tone: 4, initial: "d", final: "a" }, { char: "哭", pinyinBase: "ku", tone: 1, initial: "k", final: "u" }], english: "cry loudly; weep bitterly" },
+{ word: "怕黑", pinyin: "pà hēi", syllables: [{ char: "怕", pinyinBase: "pa", tone: 4, initial: "p", final: "a" }, { char: "黑", pinyinBase: "hei", tone: 1, initial: "h", final: "ei" }], english: "afraid of the dark" },
+{ word: "但是", pinyin: "dàn shì", syllables: [{ char: "但", pinyinBase: "dan", tone: 4, initial: "d", final: "an" }, { char: "是", pinyinBase: "shi", tone: 4, initial: "sh", final: "i" }], english: "but; however" },
+{ word: "图片", pinyin: "tú piàn", syllables: [{ char: "图", pinyinBase: "tu", tone: 2, initial: "t", final: "u" }, { char: "片", pinyinBase: "pian", tone: 4, initial: "p", final: "ian" }], english: "picture; photo; image" },
+{ word: "变成", pinyin: "biàn chéng", syllables: [{ char: "变", pinyinBase: "bian", tone: 4, initial: "b", final: "ian" }, { char: "成", pinyinBase: "cheng", tone: 2, initial: "ch", final: "eng" }], english: "become; turn into" },
+{ word: "应该", pinyin: "yīng gāi", syllables: [{ char: "应", pinyinBase: "ying", tone: 1, initial: "y", final: "ing" }, { char: "该", pinyinBase: "gai", tone: 1, initial: "g", final: "ai" }], english: "should; ought to" },
+{ word: "洗手", pinyin: "xǐ shǒu", syllables: [{ char: "洗", pinyinBase: "xi", tone: 3, initial: "x", final: "i" }, { char: "手", pinyinBase: "shou", tone: 3, initial: "sh", final: "ou" }], english: "wash hands" },
+{ word: "头发", pinyin: "tóu fa", syllables: [{ char: "头", pinyinBase: "tou", tone: 2, initial: "t", final: "ou" }, { char: "发", pinyinBase: "fa", tone: 5, initial: "f", final: "a" }], english: "hair" },
+{ word: "刚才", pinyin: "gāng cái", syllables: [{ char: "刚", pinyinBase: "gang", tone: 1, initial: "g", final: "ang" }, { char: "才", pinyinBase: "cai", tone: 2, initial: "c", final: "ai" }], english: "just now; a moment ago" },
+{ word: "运动", pinyin: "yùn dòng", syllables: [{ char: "运", pinyinBase: "yun", tone: 4, initial: "y", final: "ün" }, { char: "动", pinyinBase: "dong", tone: 4, initial: "d", final: "ong" }], english: "sport; exercise; move" },
+{ word: "完成", pinyin: "wán chéng", syllables: [{ char: "完", pinyinBase: "wan", tone: 2, initial: "w", final: "an" }, { char: "成", pinyinBase: "cheng", tone: 2, initial: "ch", final: "eng" }], english: "finish; complete; accomplish" }
+  ],
+  5: [
+    { word: "个人", pinyin: "gè rén", syllables: [{ char: "个", pinyinBase: "ge", tone: 4, initial: "g", final: "e" }, { char: "人", pinyinBase: "ren", tone: 2, initial: "r", final: "en" }], english: "individual; person" },
+    { word: "社会", pinyin: "shè huì", syllables: [{ char: "社", pinyinBase: "she", tone: 4, initial: "sh", final: "e" }, { char: "会", pinyinBase: "hui", tone: 4, initial: "h", final: "ui" }], english: "society; community" },
+    { word: "角色", pinyin: "jué sè", syllables: [{ char: "角", pinyinBase: "jue", tone: 2, initial: "j", final: "üe" }, { char: "色", pinyinBase: "se", tone: 4, initial: "s", final: "e" }], english: "role; character" },
+    { word: "代表", pinyin: "dài biǎo", syllables: [{ char: "代", pinyinBase: "dai", tone: 4, initial: "d", final: "ai" }, { char: "表", pinyinBase: "biao", tone: 3, initial: "b", final: "iao" }], english: "represent; representative" },
+    { word: "兴趣", pinyin: "xìng qù", syllables: [{ char: "兴", pinyinBase: "xing", tone: 4, initial: "x", final: "ing" }, { char: "趣", pinyinBase: "qu", tone: 4, initial: "q", final: "u" }], english: "interest; hobby" },
+    { word: "家庭", pinyin: "jiā tíng", syllables: [{ char: "家", pinyinBase: "jia", tone: 1, initial: "j", final: "ia" }, { char: "庭", pinyinBase: "ting", tone: 2, initial: "t", final: "ing" }], english: "family; household" },
+    { word: "学校", pinyin: "xué xiào", syllables: [{ char: "学", pinyinBase: "xue", tone: 2, initial: "x", final: "üe" }, { char: "校", pinyinBase: "xiao", tone: 4, initial: "x", final: "iao" }], english: "school; educational institution" },
+    { word: "活动", pinyin: "huó dòng", syllables: [{ char: "活", pinyinBase: "huo", tone: 2, initial: "h", final: "uo" }, { char: "动", pinyinBase: "dong", tone: 4, initial: "d", final: "ong" }], english: "activity; event" },
+    { word: "老师", pinyin: "lǎo shī", syllables: [{ char: "老", pinyinBase: "lao", tone: 3, initial: "l", final: "ao" }, { char: "师", pinyinBase: "shi", tone: 1, initial: "sh", final: "i" }], english: "teacher; instructor" },
+    { word: "心情", pinyin: "xīn qíng", syllables: [{ char: "心", pinyinBase: "xin", tone: 1, initial: "x", final: "in" }, { char: "情", pinyinBase: "qing", tone: 2, initial: "q", final: "ing" }], english: "mood; feeling" },
+    { word: "做饭", pinyin: "zuò fàn", syllables: [{ char: "做", pinyinBase: "zuo", tone: 4, initial: "z", final: "uo" }, { char: "饭", pinyinBase: "fan", tone: 4, initial: "f", final: "an" }], english: "cook; prepare meals" },
+    { word: "衣服", pinyin: "yī fu", syllables: [{ char: "衣", pinyinBase: "yi", tone: 1, initial: "y", final: "i" }, { char: "服", pinyinBase: "fu", tone: 5, initial: "f", final: "u" }], english: "clothes; clothing" },
+    { word: "食物", pinyin: "shí wù", syllables: [{ char: "食", pinyinBase: "shi", tone: 2, initial: "sh", final: "i" }, { char: "物", pinyinBase: "wu", tone: 4, initial: "w", final: "u" }], english: "food; edible items" },
+    { word: "唱歌", pinyin: "chàng gē", syllables: [{ char: "唱", pinyinBase: "chang", tone: 4, initial: "ch", final: "ang" }, { char: "歌", pinyinBase: "ge", tone: 1, initial: "g", final: "e" }], english: "sing; sing songs" },
+    { word: "看电影", pinyin: "kàn diàn yǐng", syllables: [{ char: "看", pinyinBase: "kan", tone: 4, initial: "k", final: "an" }, { char: "电", pinyinBase: "dian", tone: 4, initial: "d", final: "ian" }, { char: "影", pinyinBase: "ying", tone: 3, initial: "y", final: "ing" }], english: "watch a movie; see a film" },
+    { word: "读书", pinyin: "dú shū", syllables: [{ char: "读", pinyinBase: "du", tone: 2, initial: "d", final: "u" }, { char: "书", pinyinBase: "shu", tone: 1, initial: "sh", final: "u" }], english: "read books; study" },
+    { word: "时候", pinyin: "shí hou", syllables: [{ char: "时", pinyinBase: "shi", tone: 2, initial: "sh", final: "i" }, { char: "候", pinyinBase: "hou", tone: 4, initial: "h", final: "ou" }], english: "time; moment" },
+    { word: "亲近", pinyin: "qīn jìn", syllables: [{ char: "亲", pinyinBase: "qin", tone: 1, initial: "q", final: "in" }, { char: "近", pinyinBase: "jin", tone: 4, initial: "j", final: "in" }], english: "close; intimate" },
+    { word: "举手", pinyin: "jǔ shǒu", syllables: [{ char: "举", pinyinBase: "ju", tone: 3, initial: "j", final: "ü" }, { char: "手", pinyinBase: "shou", tone: 3, initial: "sh", final: "ou" }], english: "raise one's hand" },
+    { word: "大笑", pinyin: "dà xiào", syllables: [{ char: "大", pinyinBase: "da", tone: 4, initial: "d", final: "a" }, { char: "笑", pinyinBase: "xiao", tone: 4, initial: "x", final: "iao" }], english: "laugh loudly; burst into laughter" },
+    { word: "分享", pinyin: "fēn xiǎng", syllables: [{ char: "分", pinyinBase: "fen", tone: 1, initial: "f", final: "en" }, { char: "享", pinyinBase: "xiang", tone: 3, initial: "x", final: "iang" }], english: "share; divide and share" },
+    { word: "比赛", pinyin: "bǐ sài", syllables: [{ char: "比", pinyinBase: "bi", tone: 3, initial: "b", final: "i" }, { char: "赛", pinyinBase: "sai", tone: 4, initial: "s", final: "ai" }], english: "competition; match" },
+    { word: "周末", pinyin: "zhōu mò", syllables: [{ char: "周", pinyinBase: "zhou", tone: 1, initial: "zh", final: "ou" }, { char: "末", pinyinBase: "mo", tone: 4, initial: "m", final: "o" }], english: "weekend; Saturdays and Sundays" },
+    { word: "自己", pinyin: "zì jǐ", syllables: [{ char: "自", pinyinBase: "zi", tone: 4, initial: "z", final: "i" }, { char: "己", pinyinBase: "ji", tone: 3, initial: "j", final: "i" }], english: "oneself; myself" },
+    { word: "首先", pinyin: "shǒu xiān", syllables: [{ char: "首", pinyinBase: "shou", tone: 3, initial: "sh", final: "ou" }, { char: "先", pinyinBase: "xian", tone: 1, initial: "x", final: "ian" }], english: "first; above all" },
+    { word: "然后", pinyin: "rán hòu", syllables: [{ char: "然", pinyinBase: "ran", tone: 2, initial: "r", final: "an" }, { char: "后", pinyinBase: "hou", tone: 4, initial: "h", final: "ou" }], english: "then; after that" },
+    { word: "刮风", pinyin: "guā fēng", syllables: [{ char: "刮", pinyinBase: "gua", tone: 1, initial: "g", final: "ua" }, { char: "风", pinyinBase: "feng", tone: 1, initial: "f", final: "eng" }], english: "to be windy" },
+    { word: "北边", pinyin: "běi bian", syllables: [{ char: "北", pinyinBase: "bei", tone: 3, initial: "b", final: "ei" }, { char: "边", pinyinBase: "bian", tone: 1, initial: "b", final: "ian" }], english: "north side" },
+    { word: "停车", pinyin: "tíng chē", syllables: [{ char: "停", pinyinBase: "ting", tone: 2, initial: "t", final: "ing" }, { char: "车", pinyinBase: "che", tone: 1, initial: "ch", final: "e" }], english: "to park" },
+    { word: "两件", pinyin: "liǎng jiàn", syllables: [{ char: "两", pinyinBase: "liang", tone: 3, initial: "l", final: "iang" }, { char: "件", pinyinBase: "jian", tone: 4, initial: "j", final: "ian" }], english: "two pieces" },
+    { word: "衣服", pinyin: "yī fu", syllables: [{ char: "衣", pinyinBase: "yi", tone: 1, initial: "y", final: "i" }, { char: "服", pinyinBase: "fu", tone: 5, initial: "f", final: "u" }], english: "clothes" },
+    { word: "声音", pinyin: "shēng yīn", syllables: [{ char: "声", pinyinBase: "sheng", tone: 1, initial: "sh", final: "eng" }, { char: "音", pinyinBase: "yin", tone: 1, initial: "y", final: "in" }], english: "sound; voice" },
+    { word: "开始", pinyin: "kāi shǐ", syllables: [{ char: "开", pinyinBase: "kai", tone: 1, initial: "k", final: "ai" }, { char: "始", pinyinBase: "shi", tone: 3, initial: "sh", final: "i" }], english: "to start" },
+    { word: "感冒", pinyin: "gǎn mào", syllables: [{ char: "感", pinyinBase: "gan", tone: 3, initial: "g", final: "an" }, { char: "冒", pinyinBase: "mao", tone: 4, initial: "m", final: "ao" }], english: "to catch a cold" },
+    { word: "吃药", pinyin: "chī yào", syllables: [{ char: "吃", pinyinBase: "chi", tone: 1, initial: "ch", final: "i" }, { char: "药", pinyinBase: "yao", tone: 4, initial: "y", final: "ao" }], english: "to take medicine" },
+    { word: "生病", pinyin: "shēng bìng", syllables: [{ char: "生", pinyinBase: "sheng", tone: 1, initial: "sh", final: "eng" }, { char: "病", pinyinBase: "bing", tone: 4, initial: "b", final: "ing" }], english: "to get sick" },
+    { word: "滑雪", pinyin: "huá xuě", syllables: [{ char: "滑", pinyinBase: "hua", tone: 2, initial: "h", final: "ua" }, { char: "雪", pinyinBase: "xue", tone: 3, initial: "x", final: "ue" }], english: "to ski" },
+    { word: "气球", pinyin: "qì qiú", syllables: [{ char: "气", pinyinBase: "qi", tone: 4, initial: "q", final: "i" }, { char: "球", pinyinBase: "qiu", tone: 2, initial: "q", final: "iu" }], english: "balloon" },{ word: "比赛", pinyin: "bǐ sài", syllables: [{ char: "比", pinyinBase: "bi", tone: 3, initial: "b", final: "i" }, { char: "赛", pinyinBase: "sai", tone: 4, initial: "s", final: "ai" }], english: "competition; match" },
+    { word: "舞狮", pinyin: "wǔ shī", syllables: [{ char: "舞", pinyinBase: "wu", tone: 3, initial: "w", final: "u" }, { char: "狮", pinyinBase: "shi", tone: 1, initial: "sh", final: "i" }], english: "to perform lion dance" },
+    { word: "灯笼", pinyin: "dēng long", syllables: [{ char: "灯", pinyinBase: "deng", tone: 1, initial: "d", final: "eng" }, { char: "笼", pinyinBase: "long", tone: 5, initial: "l", final: "ong" }], english: "lantern" },
+    { word: "春节", pinyin: "chūn jié", syllables: [{ char: "春", pinyinBase: "chun", tone: 1, initial: "ch", final: "un" }, { char: "节", pinyinBase: "jie", tone: 2, initial: "j", final: "ie" }], english: "Spring Festival" },
+    { word: "春联", pinyin: "chūn lián", syllables: [{ char: "春", pinyinBase: "chun", tone: 1, initial: "ch", final: "un" }, { char: "联", pinyinBase: "lian", tone: 2, initial: "l", final: "ian" }], english: "Spring Festival couplets" },
+    { word: "中国新年", pinyin: "zhōng guó xīn nián", syllables: [{ char: "中", pinyinBase: "zhong", tone: 1, initial: "zh", final: "ong" }, { char: "国", pinyinBase: "guo", tone: 2, initial: "g", final: "uo" }, { char: "新", pinyinBase: "xin", tone: 1, initial: "x", final: "in" }, { char: "年", pinyinBase: "nian", tone: 2, initial: "n", final: "ian" }], english: "Chinese New Year" },
+    { word: "雨伞", pinyin: "yǔ sǎn", syllables: [{ char: "雨", pinyinBase: "yu", tone: 3, initial: "y", final: "u" }, { char: "伞", pinyinBase: "san", tone: 3, initial: "s", final: "an" }], english: "umbrella" },
+    { word: "右手", pinyin: "yòu shǒu", syllables: [{ char: "右", pinyinBase: "you", tone: 4, initial: "y", final: "ou" }, { char: "手", pinyinBase: "shou", tone: 3, initial: "sh", final: "ou" }], english: "right hand" },
+    { word: "左手", pinyin: "zuǒ shǒu", syllables: [{ char: "左", pinyinBase: "zuo", tone: 3, initial: "z", final: "uo" }, { char: "手", pinyinBase: "shou", tone: 3, initial: "sh", final: "ou" }], english: "left hand" },
+    { word: "跳舞", pinyin: "tiào wǔ", syllables: [{ char: "跳", pinyinBase: "tiao", tone: 4, initial: "t", final: "iao" }, { char: "舞", pinyinBase: "wu", tone: 3, initial: "w", final: "u" }], english: "to dance" },
+    { word: "唱歌", pinyin: "chàng gē", syllables: [{ char: "唱", pinyinBase: "chang", tone: 4, initial: "ch", final: "ang" }, { char: "歌", pinyinBase: "ge", tone: 1, initial: "g", final: "e" }], english: "to sing" },
+    { word: "椅子", pinyin: "yǐ zi", syllables: [{ char: "椅", pinyinBase: "yi", tone: 3, initial: "y", final: "i" }, { char: "子", pinyinBase: "zi", tone: 5, initial: "z", final: "i" }], english: "chair" },
+    { word: "桌子", pinyin: "zhuō zi", syllables: [{ char: "桌", pinyinBase: "zhuo", tone: 1, initial: "zh", final: "uo" }, { char: "子", pinyinBase: "zi", tone: 5, initial: "z", final: "i" }], english: "table/desk" },
+    { word: "花园", pinyin: "huā yuán", syllables: [{ char: "花", pinyinBase: "hua", tone: 1, initial: "h", final: "ua" }, { char: "园", pinyinBase: "yuan", tone: 2, initial: "y", final: "uan" }], english: "garden" },
+    { word: "进步", pinyin: "jìn bù", syllables: [{ char: "进", pinyinBase: "jin", tone: 4, initial: "j", final: "in" }, { char: "步", pinyinBase: "bu", tone: 4, initial: "b", final: "u" }], english: "to make progress" },
+    { word: "丢掉", pinyin: "diū diào", syllables: [{ char: "丢", pinyinBase: "diu", tone: 1, initial: "d", final: "iu" }, { char: "掉", pinyinBase: "diao", tone: 4, initial: "d", final: "iao" }], english: "to throw away/to lose" },
+    {word: "篮球", pinyin: "lán qiú", syllables: [{ char: "篮", pinyinBase: "lan", tone: 2, initial: "l", final: "an"}, { char: "球", pinyinBase: "qiu", tone: 2, initial: "q", final: "iu" }], english: "basketball" },
+{ word: "篮子", pinyin: "lán zi", syllables: [{ char: "篮", pinyinBase: "lan", tone: 2, initial: "l", final: "an" }, { char: "子", pinyinBase: "zi", tone: 5, initial: "z", final: "i" }], english: "basket" },
+{ word: "电视", pinyin: "diàn shì", syllables: [{ char: "电", pinyinBase: "dian", tone: 4, initial: "d", final: "ian" }, { char: "视", pinyinBase: "shi", tone: 4, initial: "sh", final: "i" }], english: "TV/television" },
+{ word: "视线", pinyin: "shì xiàn", syllables: [{ char: "视", pinyinBase: "shi", tone: 4, initial: "sh", final: "i" }, { char: "线", pinyinBase: "xian", tone: 4, initial: "x", final: "ian" }], english: "line of sight" },
+{ word: "比赛", pinyin: "bǐ sài", syllables: [{ char: "比", pinyinBase: "bi", tone: 3, initial: "b", final: "i" }, { char: "赛", pinyinBase: "sai", tone: 4, initial: "s", final: "ai" }], english: "match/competition" },
+{ word: "认真", pinyin: "rèn zhēn", syllables: [{ char: "认", pinyinBase: "ren", tone: 4, initial: "r", final: "en" }, { char: "真", pinyinBase: "zhen", tone: 1, initial: "zh", final: "en" }], english: "earnest/serious" },
+{ word: "认识", pinyin: "rèn shi", syllables: [{ char: "认", pinyinBase: "ren", tone: 4, initial: "r", final: "en" }, { char: "识", pinyinBase: "shi", tone: 5, initial: "sh", final: "i" }], english: "know/recognize" },
+{ word: "超能力", pinyin: "chāo néng lì", syllables: [{ char: "超", pinyinBase: "chao", tone: 1, initial: "ch", final: "ao" }, { char: "能", pinyinBase: "neng", tone: 2, initial: "n", final: "eng" }, { char: "力", pinyinBase: "li", tone: 4, initial: "l", final: "i" }], english: "super power" },
+{ word: "身后运球", pinyin: "shēn hòu yùn qiú", syllables: [{ char: "身", pinyinBase: "shen", tone: 1, initial: "sh", final: "en" }, { char: "后", pinyinBase: "hou", tone: 4, initial: "h", final: "ou" }, { char: "运", pinyinBase: "yun", tone: 4, initial: "y", final: "un" }, { char: "球", pinyinBase: "qiu", tone: 2, initial: "q", final: "iu" }], english: "dribble behind the back" },
+{ word: "练习", pinyin: "liàn xí", syllables: [{ char: "练", pinyinBase: "lian", tone: 4, initial: "l", final: "ian" }, { char: "习", pinyinBase: "xi", tone: 2, initial: "x", final: "i" }], english: "to practice" },
+{ word: "教练", pinyin: "jiào liàn", syllables: [{ char: "教", pinyinBase: "jiao", tone: 4, initial: "j", final: "iao" }, { char: "练", pinyinBase: "lian", tone: 4, initial: "l", final: "ian" }], english: "coach" },
+{ word: "球队", pinyin: "qiú duì", syllables: [{ char: "球", pinyinBase: "qiu", tone: 2, initial: "q", final: "iu" }, { char: "队", pinyinBase: "dui", tone: 4, initial: "d", final: "ui" }], english: "team" },
+{ word: "队友", pinyin: "duì yǒu", syllables: [{ char: "队", pinyinBase: "dui", tone: 4, initial: "d", final: "ui" }, { char: "友", pinyinBase: "you", tone: 3, initial: "y", final: "ou" }], english: "teammate" },
+{ word: "队员", pinyin: "duì yuán", syllables: [{ char: "队", pinyinBase: "dui", tone: 4, initial: "d", final: "ui" }, { char: "员", pinyinBase: "yuan", tone: 2, initial: "y", final: "uan" }], english: "team member" },
+{ word: "篮球运动员", pinyin: "lán qiú yùn dòng yuán", syllables: [{ char: "篮", pinyinBase: "lan", tone: 2, initial: "l", final: "an" }, { char: "球", pinyinBase: "qiu", tone: 2, initial: "q", final: "iu" }, { char: "运", pinyinBase: "yun", tone: 4, initial: "y", final: "un" }, { char: "动", pinyinBase: "dong", tone: 4, initial: "d", final: "ong" }, { char: "员", pinyinBase: "yuan", tone: 2, initial: "y", final: "uan" }], english: "basketball player" },
+{ word: "运球", pinyin: "yùn qiú", syllables: [{ char: "运", pinyinBase: "yun", tone: 4, initial: "y", final: "un" }, { char: "球", pinyinBase: "qiu", tone: 2, initial: "q", final: "iu" }], english: "to dribble" },
+{ word: "运动", pinyin: "yùn dòng", syllables: [{ char: "运", pinyinBase: "yun", tone: 4, initial: "y", final: "un" }, { char: "动", pinyinBase: "dong", tone: 4, initial: "d", final: "ong" }], english: "sport/exercise" },
+{ word: "水杯", pinyin: "shuǐ bēi", syllables: [{ char: "水", pinyinBase: "shui", tone: 3, initial: "sh", final: "ui" }, { char: "杯", pinyinBase: "bei", tone: 1, initial: "b", final: "ei" }], english: "water cup" },
+{ word: "二十三号", pinyin: "èr shí sān hào", syllables: [{ char: "二", pinyinBase: "er", tone: 4, initial: "e", final: "r" }, { char: "十", pinyinBase: "shi", tone: 2, initial: "sh", final: "i" }, { char: "三", pinyinBase: "san", tone: 1, initial: "s", final: "an" }, { char: "号", pinyinBase: "hao", tone: 4, initial: "h", final: "ao" }], english: "Number 23" },
+{ word: "零", pinyin: "líng", syllables: [{ char: "零", pinyinBase: "ling", tone: 2, initial: "l", final: "ing" }], english: "zero" },
+{ word: "懂不懂", pinyin: "dǒng bu dǒng", syllables: [{ char: "懂", pinyinBase: "dong", tone: 3, initial: "d", final: "ong" }, { char: "不", pinyinBase: "bu", tone: 5, initial: "b", final: "u" }, { char: "懂", pinyinBase: "dong", tone: 3, initial: "d", final: "ong" }], english: "understand or not?" },
+{ word: "电脑", pinyin: "diàn nǎo", syllables: [{ char: "电", pinyinBase: "dian", tone: 4, initial: "d", final: "ian" }, { char: "脑", pinyinBase: "nao", tone: 3, initial: "n", final: "ao" }], english: "computer" },
+{ word: "茶叶", pinyin: "chá yè", syllables: [{ char: "茶", pinyinBase: "cha", tone: 2, initial: "ch", final: "a" }, { char: "叶", pinyinBase: "ye", tone: 4, initial: "y", final: "e" }], english: "tea leaves; tea" },
+{ word: "汽水", pinyin: "qì shuǐ", syllables: [{ char: "汽", pinyinBase: "qi", tone: 4, initial: "q", final: "i" }, { char: "水", pinyinBase: "shui", tone: 3, initial: "sh", final: "ui" }], english: "soda; carbonated drink" },
+{ word: "礼物", pinyin: "lǐ wù", syllables: [{ char: "礼", pinyinBase: "li", tone: 3, initial: "l", final: "i" }, { char: "物", pinyinBase: "wu", tone: 4, initial: "w", final: "u" }], english: "gift; present" },
+{ word: "问题", pinyin: "wèn tí", syllables: [{ char: "问", pinyinBase: "wen", tone: 4, initial: "w", final: "en" }, { char: "题", pinyinBase: "ti", tone: 2, initial: "t", final: "i" }], english: "question; problem" },
+{ word: "帮忙", pinyin: "bāng máng", syllables: [{ char: "帮", pinyinBase: "bang", tone: 1, initial: "b", final: "ang" }, { char: "忙", pinyinBase: "mang", tone: 2, initial: "m", final: "ang" }], english: "help; assist" },
+{ word: "坏了", pinyin: "huài le", syllables: [{ char: "坏", pinyinBase: "huai", tone: 4, initial: "h", final: "uai" }, { char: "了", pinyinBase: "le", tone: 5, initial: "l", final: "e" }], english: "broken; out of order" },
+{ word: "意思", pinyin: "yì si", syllables: [{ char: "意", pinyinBase: "yi", tone: 4, initial: "y", final: "i" }, { char: "思", pinyinBase: "si", tone: 5, initial: "s", final: "i" }], english: "meaning; idea" },
+{ word: "一本书", pinyin: "yì běn shū", syllables: [{ char: "一", pinyinBase: "yi", tone: 4, initial: "y", final: "i" }, { char: "本", pinyinBase: "ben", tone: 3, initial: "b", final: "en" }, { char: "书", pinyinBase: "shu", tone: 1, initial: "sh", final: "u" }], english: "a book" },
+{ word: "鸡蛋", pinyin: "jī dàn", syllables: [{ char: "鸡", pinyinBase: "ji", tone: 1, initial: "j", final: "i" }, { char: "蛋", pinyinBase: "dan", tone: 4, initial: "d", final: "an" }], english: "egg" },
+{ word: "蛋白", pinyin: "dàn bái", syllables: [{ char: "蛋", pinyinBase: "dan", tone: 4, initial: "d", final: "an" }, { char: "白", pinyinBase: "bai", tone: 2, initial: "b", final: "ai" }], english: "egg white; protein" },
+{ word: "蛋黄", pinyin: "dàn huáng", syllables: [{ char: "蛋", pinyinBase: "dan", tone: 4, initial: "d", final: "an" }, { char: "黄", pinyinBase: "huang", tone: 2, initial: "h", final: "uang" }], english: "egg yolk" },
+{ word: "黑熊", pinyin: "hēi xióng", syllables: [{ char: "黑", pinyinBase: "hei", tone: 1, initial: "h", final: "ei" }, { char: "熊", pinyinBase: "xiong", tone: 2, initial: "x", final: "iong" }], english: "black bear" },
+{ word: "苹果", pinyin: "píng guǒ", syllables: [{ char: "苹", pinyinBase: "ping", tone: 2, initial: "p", final: "ing" }, { char: "果", pinyinBase: "guo", tone: 3, initial: "g", final: "uo" }], english: "apple" },
+{ word: "蓝色", pinyin: "lán sè", syllables: [{ char: "蓝", pinyinBase: "lan", tone: 2, initial: "l", final: "an" }, { char: "色", pinyinBase: "se", tone: 4, initial: "s", final: "e" }], english: "blue" },
+{ word: "游泳", pinyin: "yóu yǒng", syllables: [{ char: "游", pinyinBase: "you", tone: 2, initial: "y", final: "ou" }, { char: "泳", pinyinBase: "yong", tone: 3, initial: "y", final: "ong" }], english: "swim" },
+{ word: "抓鱼", pinyin: "zhuā yú", syllables: [{ char: "抓", pinyinBase: "zhua", tone: 1, initial: "zh", final: "ua" }, { char: "鱼", pinyinBase: "yu", tone: 2, initial: "y", final: "ü" }], english: "catch fish" },
+{ word: "西瓜", pinyin: "xī guā", syllables: [{ char: "西", pinyinBase: "xi", tone: 1, initial: "x", final: "i" }, { char: "瓜", pinyinBase: "gua", tone: 1, initial: "g", final: "ua" }], english: "watermelon" },
+{ word: "果汁", pinyin: "guǒ zhī", syllables: [{ char: "果", pinyinBase: "guo", tone: 3, initial: "g", final: "uo" }, { char: "汁", pinyinBase: "zhi", tone: 1, initial: "zh", final: "i" }], english: "fruit juice" },
+{ word: "蛋糕", pinyin: "dàn gāo", syllables: [{ char: "蛋", pinyinBase: "dan", tone: 4, initial: "d", final: "an" }, { char: "糕", pinyinBase: "gao", tone: 1, initial: "g", final: "ao" }], english: "cake" },
+{ word: "生气", pinyin: "shēng qì", syllables: [{ char: "生", pinyinBase: "sheng", tone: 1, initial: "sh", final: "eng" }, { char: "气", pinyinBase: "qi", tone: 4, initial: "q", final: "i" }], english: "angry; get angry" },
+{ word: "影子", pinyin: "yǐng zi", syllables: [{ char: "影", pinyinBase: "ying", tone: 3, initial: "y", final: "ing" }, { char: "子", pinyinBase: "zi", tone: 5, initial: "z", final: "i" }], english: "shadow" },
+{ word: "气球", pinyin: "qì qiú", syllables: [{ char: "气", pinyinBase: "qi", tone: 4, initial: "q", final: "i" }, { char: "球", pinyinBase: "qiu", tone: 2, initial: "q", final: "iu" }], english: "balloon" }
+  ]
+};
+
+    const initials = ["b","p","m","f","d","t","n","l","g","k","h","j","q","x","zh","ch","sh","r","z","c","s","y","w"];
+    const finals = ["a","o","e","i","u","ü","ai","ei","ui","ao","ou","iu","ie","üe","an","en","in","un","ün","ang","eng","ing","ong","ia","iao","ian","iang","iong","ua","uo","uai","uan","uang","üan"];
+    const confuseInitials = {
+      "b": ["p","d"],"p": ["b","d"],"m": ["n"],"f": ["t","h"],"d": ["t","b","p","q"],"t": ["d","f"],
+      "n": ["l","m"],"l": ["n","r"],"g": ["k","q"],"k": ["g","h"],"h": ["k","g"],"j": ["q","x"],
+      "q": ["j","x"],"x": ["j","q"],"zh": ["ch","sh","z","j"],"ch": ["zh","sh","c"],"sh": ["ch","zh","s"],
+      "r": ["l","y"],"z": ["c","s"],"c": ["z","s"],"s": ["z","c","x"],"y": ["j","w"],"w": ["y","j"]
+    };
+    const confuseFinals = {
+      "a": ["ai","an"],"o": ["ou","ong"],"e": ["ei","en"],"i": ["ie","in"],"u": ["ü","un"],"ü": ["üe","un"],
+      "ai": ["a","ei"],"ei": ["ai","e"],"ui": ["u","ou"],"ao": ["ou","a"],"ou": ["uo","ong"],"iu": ["i","u"],
+      "ie": ["i","e"],"üe": ["ü","e"],"an": ["ang","a"],"en": ["eng","e"],"in": ["ing","i"],"un": ["ong","üe"],
+      "ang": ["an","a"],"eng": ["en","e"],"ing": ["in","i"],"ong": ["un","ou"],"ia": ["ie","iao"],
+      "iao": ["ia","ao"],"ian": ["iang","an"],"iang": ["ian","ang"],"iong": ["ong","ing"],"ua": ["uo","uai"],
+      "uo": ["ua","o"],"uai": ["ua","ai"],"uan": ["uang","an"],"uang": ["uan","ang"],"üan": ["üe","uan"]
+    };
+
+    const homeSection = document.getElementById("home");
+    const gameSection = document.getElementById("game");
+    const endSection = document.getElementById("end");
+    const gradeBtns = document.querySelectorAll(".grade-btn");
+    const numBtns = document.querySelectorAll(".num-btn");
+    const customInput = document.getElementById("custom-num");
+    const startBtn = document.getElementById("start-game");
+    const wordDisplay = document.getElementById("word-display");
+    const writingContainer = document.getElementById("writing-container");
+    const metaLineEl = document.getElementById("meta-line");
+    const playSoundBtn = document.getElementById("play-sound");
+    const choicesEl = document.getElementById("choices");
+    const progressBar = document.getElementById("progress-bar");
+    const nextBtn = document.getElementById("next-btn");
+    const quitBtn = document.getElementById("quit-btn");
+    const retryBtn = document.getElementById("retry-btn");
+    const backHomeBtn = document.getElementById("back-home-btn");
+    const gameGradeEl = document.getElementById("game-grade");
+    const qCountEl = document.getElementById("q-count");
+    const scoreText = document.getElementById("score-text");
+    const finalScoreEl = document.getElementById("final-score");
+    const encourageEl = document.getElementById("encourage");
+    const recBtn = document.getElementById("rec-btn");
+    const stopRecBtn = document.getElementById("stop-rec-btn");
+    const recStatus = document.getElementById("rec-status");
+    const transcriptEl = document.getElementById("transcript");
+    const userRecAudio = document.getElementById("user-rec-audio");
+    const audioEl = document.getElementById("audio");
+    const stageIndicator = document.getElementById("stage-indicator");
+
+    let selectedGrade = 4;
+    let selectedNum = "all";
+    let customNum = 1;
+    let pool = [];
+    let order = [];
+    let total = 0;
+    let score = 0;
+    let cur = 0;
+    let mediaRecorder = null;
+    let recognition = null;
+    let mediaStream = null;
+    let recordedChunks = [];
+    let recDone = false;
+    let recCorrect = false;
+    let currentStage = 1; // 1: 录音, 2: 拼音选择, 3: 书写
+    let currentCharIndex = 0;
+    let writer = null;
+    let writingAttempts = 0;
+    let isCustomWords = false;
+    let isCurrentWordCorrect = true;
+    const selectedWords = new Set();
+
+    function shuffleArray(arr) {
+      return arr.sort(() => Math.random() - 0.5);
+    }
+
+    function buildPoolForGrade(grade) {
+      return gradeWords[grade] || [];
+    }
+
+    function decomposePinyin(pinyinBase) {
+      let initial = "";
+      let final = pinyinBase;
+      for (const init of initials) {
+        if (pinyinBase.startsWith(init)) {
+          initial = init;
+          final = pinyinBase.substring(init.length);
+          break;
+        }
+      }
+      if (final.startsWith("u") && ["j","q","x"].includes(initial)) {
+        final = "ü" + final.substring(1);
+      }
+      return { initial, final };
+    }
+
+    function markTone(s, tone) {
+      if (tone === 5 || tone === 0) return s;
+      const vowels = 'aeiouü';
+      const marks = ['āēīōūǖ', 'áéíóúǘ', 'ǎěǐǒǔǚ', 'àèìòùǜ'];
+      let targetIndex = -1;
+      let priority = -1;
+      for (let i = 0; i < s.length; i++) {
+        const idx = vowels.indexOf(s[i]);
+        if (idx !== -1) {
+          const prio = (s[i] === 'a' || s[i] === 'e' || s[i] === 'o') ? 2 : (s[i] === 'i' && i === s.length - 1 && priority < 1) ? 1 : 0;
+          if (prio > priority) {
+            targetIndex = i;
+            priority = prio;
+          }
+        }
+      }
+      if (targetIndex === -1) return s;
+      const mark = marks[tone - 1][vowels.indexOf(s[targetIndex])];
+      s = s.substring(0, targetIndex) + mark + s.substring(targetIndex + 1);
+      if (['j','q','x'].includes(s[0]) && s.includes('ü')) s = s.replace('ü','u');
+      return s;
+    }
+
+    function buildWordPinyinMarked(syllables) {
+      return syllables.map(s => markTone(s.pinyinBase, s.tone)).join(' ');
+    }
+
+    function playBaiduTtsForWord(word) {
+      const url = `https://tts.baidu.com/text2audio?tex=${word}&cuid=dict&lan=ZH&ctp=2&pdt=30&vol=9`;
+      audioEl.src = url; 
+      audioEl.play().catch(() => {
+        recStatus.textContent = "（请点击播放按钮听取发音）";
+      });
+    }
+
+    function startGame() {
+      wordCorrectStatus = new Array(total).fill(false);  // 先全部标为错
+      if (isCustomWords && selectedWords.size > 0) {
+        const allWords = Object.values(gradeWords).flat();
+        // 修改：增加去重逻辑，确保同一个词只出现一次
+        const uniqueMap = new Map();
+        allWords.forEach(w => {
+            if (selectedWords.has(w.word) && !uniqueMap.has(w.word)) {
+                uniqueMap.set(w.word, w);
+            }
+        });
+        pool = Array.from(uniqueMap.values());
+      } else {
+        pool = buildPoolForGrade(selectedGrade);
+      }
+
+      let n = pool.length;
+      if (selectedNum !== "all") {
+        const cap = selectedNum === "custom" ? customNum : parseInt(selectedNum);
+        n = Math.min(cap || n, pool.length);
+      }
+      if (n < pool.length) pool = shuffleArray(pool).slice(0,n);
+      total = pool.length; score = 0; cur = 0;
+      order = shuffleArray(Array.from(Array(total).keys()));
+
+      homeSection.style.display = "none";
+      gameSection.style.display = "block";
+      endSection.style.display = "none";
+      gameGradeEl.textContent = isCustomWords ? "自定义选词" : `${selectedGrade}年级`;
+      qCountEl.textContent = `${cur+1} / ${total}`;
+      scoreText.textContent = `得分：${score}`;
+      progressBar.style.width = `0%`;
+      showQuestion(cur);
+    }
+
+    function showQuestion(index) {
+      // 重置所有状态
+      isCurrentWordCorrect = true;
+      recDone = false;
+      recCorrect = false;
+      currentStage = 1;
+      currentCharIndex = 0;
+      writingAttempts = 0;
+      nextBtn.style.display = "none";
+      
+      // 重置UI
+      transcriptEl.textContent = "（识别结果）";
+      transcriptEl.style.borderColor = transcriptEl.style.background = transcriptEl.style.color = "";
+      userRecAudio.style.display = "none";
+      userRecAudio.src = "";
+      recStatus.textContent = "（未录音）";
+      recBtn.style.display = "inline-block";
+      stopRecBtn.style.display = "none";
+      choicesEl.innerHTML = "";
+      stageIndicator.textContent = "第一阶段：请先朗读词语并录音验证";
+      stageIndicator.style.backgroundColor = "#f0f7ff";
+      stageIndicator.style.color = "#1976d2";
+      writingContainer.style.display = "none";
+      writingContainer.innerHTML = "";
+      wordDisplay.style.display = "flex";
+
+      // 停止并清理媒体资源
+      if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+      }
+      if (recognition && recognition.state !== "inactive") {
+        recognition.stop();
+        recognition = null;
+      }
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+        mediaStream = null;
+      }
+      recordedChunks = [];
+
+      const q = pool[order[index]];
+      wordDisplay.innerHTML = q.syllables.map((syl, idx) => `
+        <div class="word-char-container">
+          <span class="pinyin-display"></span>
+          <span class="word-char" data-index="${idx}">${syl.char}</span>
+        </div>
+      `).join('');
+      metaLineEl.textContent = q.english || "（英文释义暂缺）";
+      qCountEl.textContent = `${index+1} / ${total}`;
+      progressBar.style.width = Math.round((index/total)*100) + "%";
+    }
+
+    function checkStageProgress() {
+      const q = pool[order[cur]];
+      
+      // 第一阶段：录音正确后进入第二阶段
+      if (currentStage === 1 && recDone && recCorrect) {
+        currentStage = 2;
+        stageIndicator.textContent = "第二阶段：请选择正确的拼音";
+        stageIndicator.style.backgroundColor = "#e8f5e9";
+        stageIndicator.style.color = "#2e7d32";
+        showPinyinSelectionForChar(currentCharIndex);
+      }
+
+      // 第二阶段：所有字拼音选择完成后进入第三阶段
+      if (currentStage === 2 && currentCharIndex >= q.syllables.length) {
+        currentStage = 3;
+        currentCharIndex = 0;
+        stageIndicator.textContent = "第三阶段：请书写汉字";
+        stageIndicator.style.backgroundColor = "#fffde7";
+        stageIndicator.style.color = "#ef6c00";
+        choicesEl.innerHTML = "";
+        showWritingForChar(currentCharIndex);
+      }
+
+      // 第三阶段：所有字书写完成后显示下一题按钮
+      if (currentStage === 3 && currentCharIndex >= q.syllables.length) {
+        nextBtn.style.display = "inline-block";
+      }
+    }
+
+    function highlightCurrentChar(index) {
+      document.querySelectorAll(".word-char").forEach((span, i) => {
+        if (i === index) {
+          span.classList.remove("inactive");
+        } else {
+          span.classList.add("inactive");
+        }
+      });
+    }
+
+    function showPinyinSelectionForChar(charIndex) {
+      const q = pool[order[cur]];
+      const syl = q.syllables[charIndex];
+      highlightCurrentChar(charIndex);
+
+      choicesEl.innerHTML = "";
+
+      // 声母栏
+      const initialDiv = document.createElement("div");
+      initialDiv.style.display = "flex";
+      initialDiv.style.gap = "10px";
+      initialDiv.style.justifyContent = "flex-start";
+      initialDiv.style.marginBottom = "10px";
+      let initialOptions = [syl.initial || "无"];
+      let conf = confuseInitials[syl.initial] || [];
+      initialOptions = initialOptions.concat(conf);
+      while (initialOptions.length < 3) {
+        const rand = initials[Math.floor(Math.random() * initials.length)];
+        if (!initialOptions.includes(rand)) initialOptions.push(rand);
+      }
+      initialOptions = shuffleArray(initialOptions);
+      initialOptions.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "choice";
+        btn.textContent = opt;
+        btn.dataset.type = "initial";
+        btn.dataset.value = opt === "无" ? "" : opt;
+        btn.addEventListener("click", () => selectPinyinOption(btn));
+        initialDiv.appendChild(btn);
+      });
+      const initialPrompt = document.createElement("div");
+      initialPrompt.textContent = "选择声母（initial）";
+      initialPrompt.style.fontWeight = "900";
+      initialPrompt.style.marginBottom = "6px";
+      choicesEl.appendChild(initialPrompt);
+      choicesEl.appendChild(initialDiv);
+
+      // 韵母栏
+      const finalDiv = document.createElement("div");
+      finalDiv.style.display = "flex";
+      finalDiv.style.gap = "10px";
+      finalDiv.style.justifyContent = "flex-start";
+      finalDiv.style.marginBottom = "10px";
+      let finalOptions = [syl.final];
+      let confF = confuseFinals[syl.final] || [];
+      finalOptions = finalOptions.concat(confF);
+      while (finalOptions.length < 3) {
+        const rand = finals[Math.floor(Math.random() * finals.length)];
+        if (!finalOptions.includes(rand)) finalOptions.push(rand);
+      }
+      finalOptions = shuffleArray(finalOptions);
+      finalOptions.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "choice";
+        btn.textContent = opt;
+        btn.dataset.type = "final";
+        btn.dataset.value = opt;
+        btn.addEventListener("click", () => selectPinyinOption(btn));
+        finalDiv.appendChild(btn);
+      });
+      const finalPrompt = document.createElement("div");
+      finalPrompt.textContent = "选择韵母（final）";
+      finalPrompt.style.fontWeight = "900";
+      finalPrompt.style.marginBottom = "6px";
+      choicesEl.appendChild(finalPrompt);
+      choicesEl.appendChild(finalDiv);
+
+      // 声调栏
+      const toneDiv = document.createElement("div");
+      toneDiv.style.display = "flex";
+      toneDiv.style.gap = "10px";
+      toneDiv.style.justifyContent = "flex-start";
+      const toneOptions = ["ˉ", "ˊ", "ˇ", "ˋ", "轻声"];
+      toneOptions.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.className = "choice";
+        btn.textContent = opt;
+        btn.dataset.type = "tone";
+        btn.dataset.value = opt === "轻声" ? "5" : (i + 1).toString();
+        btn.addEventListener("click", () => selectPinyinOption(btn));
+        toneDiv.appendChild(btn);
+      });
+      const tonePrompt = document.createElement("div");
+      tonePrompt.textContent = "选择声调（tone）";
+      tonePrompt.style.fontWeight = "900";
+      tonePrompt.style.marginBottom = "6px";
+      choicesEl.appendChild(tonePrompt);
+      choicesEl.appendChild(toneDiv);
+    }
+
+    function selectPinyinOption(btn) {
+      const type = btn.dataset.type;
+      document.querySelectorAll(`.choice[data-type="${type}"]`).forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      checkPinyinAllSelected();
+    }
+
+    function checkPinyinAllSelected() {
+      const selectedInitial = document.querySelector('.choice[data-type="initial"].selected');
+      const selectedFinal = document.querySelector('.choice[data-type="final"].selected');
+      const selectedTone = document.querySelector('.choice[data-type="tone"].selected');
+      if (selectedInitial && selectedFinal && selectedTone) {
+        handlePinyinSelections();
+      }
+    }
+
+    function handlePinyinSelections() {
+      const q = pool[order[cur]];
+      const syl = q.syllables[currentCharIndex];
+      const correctInitial = syl.initial;
+      const correctFinal = syl.final;
+      const correctTone = syl.tone;
+
+      const selectedInitial = document.querySelector('.choice[data-type="initial"].selected').dataset.value;
+      const selectedFinal = document.querySelector('.choice[data-type="final"].selected').dataset.value;
+      const selectedTone = parseInt(document.querySelector('.choice[data-type="tone"].selected').dataset.value, 10);
+
+      let initialCorrect = selectedInitial === correctInitial;
+      let finalCorrect = selectedFinal === correctFinal;
+      let toneCorrect = selectedTone === correctTone;
+
+      // 标记颜色
+      document.querySelectorAll('.choice[data-type="initial"]').forEach(btn => {
+        if (btn.dataset.value === correctInitial) btn.classList.add("correct");
+        else if (btn.classList.contains("selected")) btn.classList.add("wrong");
+      });
+      document.querySelectorAll('.choice[data-type="final"]').forEach(btn => {
+        if (btn.dataset.value === correctFinal) btn.classList.add("correct");
+        else if (btn.classList.contains("selected")) btn.classList.add("wrong");
+      });
+      document.querySelectorAll('.choice[data-type="tone"]').forEach(btn => {
+        if (parseInt(btn.dataset.value, 10) === correctTone) btn.classList.add("correct");
+        else if (btn.classList.contains("selected")) btn.classList.add("wrong");
+      });
+
+      // 禁用所有按钮
+      document.querySelectorAll(".choice").forEach(b => b.disabled = true);
+    // 如果全对，显示正确拼音；如果有错，标记当前词为错误
+    if (initialCorrect && finalCorrect && toneCorrect) {
+      // score++;  <--- 【删除】这里不再立即加分
+      // scoreText.textContent = ...; <--- 【删除】这里不再立即更新显示
+      
+      const pinyinSpan = wordDisplay.querySelectorAll('.pinyin-display')[currentCharIndex];
+      pinyinSpan.textContent = markTone(syl.pinyinBase, syl.tone);
+      pinyinSpan.style.display = 'block';
+    } else {
+      isCurrentWordCorrect = false; // <--- 【新增】只要有一个字（或声韵调）选错，这个词就不得分
+    }
+
+    // 进入下一个字或下一阶段
+    setTimeout(() => {
+      currentCharIndex++;
+      if (currentCharIndex < q.syllables.length) {
+        choicesEl.innerHTML = "";
+        showPinyinSelectionForChar(currentCharIndex);
+      } else {
+        // 【新增】整词的所有字都处理完了，检查是否一直保持正确
+        if (isCurrentWordCorrect) {
+          score++; // 整词全对才加1分
+          scoreText.textContent = `得分：${score}`;
+          wordCorrectStatus[cur] = true;   // ← 记录这题正确
+        }
+        checkStageProgress();
+      }
+    }, 1500);
+    }
+
+    function showWritingForChar(charIndex) {
+      const q = pool[order[cur]];
+      writingContainer.style.display = "flex";
+      wordDisplay.style.display = "none";
+      writingContainer.innerHTML = q.syllables.map((syl, idx) => {
+        if (idx === charIndex) {
+          return `<div id="writer-${idx}" class="writer-div"></div>`;
+        } else {
+          return `<span class="word-char">${syl.char}</span>`;
+        }
+      }).join('');
+
+      writingAttempts = 0;
+      writer = HanziWriter.create(`writer-${charIndex}`, q.syllables[charIndex].char, {
+        width: 300,
+        height: 300,
+        padding: 5,
+        showOutline: false,
+        radicalColor: '#166E00',
+        onCorrectStroke: () => {},
+        onComplete: (isMatch) => {
+          if (isMatch) {
+            setTimeout(() => {
+              currentCharIndex++;
+              if (currentCharIndex < q.syllables.length) {
+                showWritingForChar(currentCharIndex);
+              } else {
+                checkStageProgress();
+              }
+            }, 1000);
+          } else {
+            writingAttempts++;
+            if (writingAttempts >= 2) {
+              writer.showOutline();
+            }
+            setTimeout(() => writer.quiz({}), 1000);
+          }
+        }
+      });
+      writer.quiz({});
+    }
+
+    async function ensureMediaStream() {
+      if (mediaStream) return mediaStream;
+      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      return mediaStream;
+    }
+
+    function createRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return null;
+      const rec = new SpeechRecognition();
+      rec.lang = 'zh-CN';
+      rec.interimResults = false;
+      rec.maxAlternatives = 1;
+      return rec;
+    }
+
+    recBtn.addEventListener("click", async ()=>{
+      try {
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+          mediaRecorder.stop();
+        }
+        
+        const stream = await ensureMediaStream();
+        recordedChunks = [];
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = e => e.data.size && recordedChunks.push(e.data);
+        mediaRecorder.onstart = () => {
+          recStatus.textContent = "（正在录音...请朗读词语）";
+          recBtn.style.display = "none";
+          stopRecBtn.style.display = "inline-block";
+          transcriptEl.textContent = "（录音中...）";
+        };
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunks, {type:'audio/webm'});
+          userRecAudio.src = URL.createObjectURL(blob);
+          userRecAudio.style.display = "inline-block";
+          recStatus.textContent = "（录音完成，正在识别...）";
+          recBtn.style.display = "inline-block";
+          stopRecBtn.style.display = "none";
+          recDone = true;
+        };
+        mediaRecorder.start();
+      } catch (e) { 
+        alert("无法录音：" + e.message); 
+        recStatus.textContent = "（录音失败）";
+      }
+
+      if (recognition && recognition.state !== "inactive") {
+        recognition.stop();
+      }
+      recognition = createRecognition();
+      
+      if (!recognition) {
+        transcriptEl.textContent = "（浏览器不支持语音识别）";
+        transcriptEl.style.color = "#B71C1C";
+        return;
+      }
+      
+      transcriptEl.textContent = "（等待识别...）";
+      const q = pool[order[cur]];
+      recognition.onresult = e => {
+        const text = Array.from(e.results).map(r=>r[0].transcript).join('');
+        transcriptEl.textContent = text || "（未识别到）";
+        const normalized = text.replace(/\s+/g,'');
+        // 严格验证：必须包含所有字符
+        const ok = q.word.split('').every(ch => normalized.includes(ch));
+        
+        if (ok) {
+          transcriptEl.style.borderColor = "#4CAF50";
+          transcriptEl.style.background = "#E8F5E9";
+          transcriptEl.style.color = "#1B5E20";
+          recCorrect = true;
+          recStatus.textContent = "（朗读正确！）";
+        } else {
+          transcriptEl.style.borderColor = "#E53935";
+          transcriptEl.style.background = "#FFEBEE";
+          transcriptEl.style.color = "#B71C1C";
+          recCorrect = false;
+          recStatus.textContent = "（朗读不正确，请重试）";
+        }
+        
+        checkStageProgress();
+      };
+      
+      recognition.onerror = e => {
+        transcriptEl.textContent = "（识别出错）";
+        transcriptEl.style.color = "#B71C1C";
+        recStatus.textContent = "（请重试）";
+      };
+      
+      recognition.start();
+    });
+
+    stopRecBtn.addEventListener("click", ()=>{
+      if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+      }
+      if (recognition && recognition.state !== "inactive") {
+        recognition.stop();
+      }
+    });
+
+    playSoundBtn.addEventListener("click", ()=>{
+      const q = pool[order[cur]];
+      playBaiduTtsForWord(q.word);
+    });
+
+    nextBtn.addEventListener("click", ()=>{
+      cur++;
+      if (cur < total) {
+        showQuestion(cur);
+      } else {
+        endGame();
+      }
+    });
+
+    function endGame() {
+      gameSection.style.display = "none"; 
+      endSection.style.display = "block";
+      const pct = Math.round((score/total)*100);
+      finalScoreEl.textContent = `${score} / ${total} = ${pct}%`;
+
+      // 计算Dojo分
+      let dojoPoints = 0;
+      let dojoText = "";
+      let showDojoInfo = total >= 5;
+      if (showDojoInfo) {
+      if (pct >= 60 && pct < 70) {
+        dojoPoints = 1;
+        dojoText = "恭喜获得1个Dojo分";
+      } else if (pct >= 70 && pct < 80) {
+        dojoPoints = 1;
+        dojoText = "恭喜获得1个Dojo分";
+      } else if (pct >= 80 && pct < 90) {
+        dojoPoints = 2;
+        dojoText = "恭喜获得2个Dojo分";
+      } else if (pct >= 90 && pct < 100) {
+        dojoPoints =2;
+        dojoText = "恭喜获得2个Dojo分";
+      } else if (pct === 100) {
+        dojoPoints = 3;
+        dojoText = "恭喜获得3个Dojo分";
+      } else {
+    showDojoInfo = false;
+  }
+}
+
+      // 根据分数设置不同鼓励语
+      let phrases;
+      if (pct >= 90) {
+        phrases = [
+          "太出色了！继续加油 💪",
+          "太棒了！再挑战一次吧 🌟",
+          "完美！继续保持好习惯 😊",
+          "惊人的进步，继续练就更棒！🎉",
+          "太优秀了！你的发音堪称完美！👏"
+        ];
+      } else if (pct >= 70) {
+        phrases = [
+          "做得很好！继续加油 💪",
+          "很不错！再挑战一次吧 🌟",
+          "完成得很棒，继续保持好习惯 😊",
+          "有明显进步，继续练就更棒！🎉",
+          "表现优秀！你的发音更进一步了！👏"
+        ];
+      } else if (pct >= 60) {
+        phrases = [
+          "恭喜过关！继续加油 💪",
+          "刚好及格，再挑战一次吧 🌟",
+          "完成了练习，继续保持好习惯 😊",
+          "有进步空间，继续练就更棒！🎉",
+          "达到目标了！你的发音还能更好！👏"
+        ];
+      } else {
+        phrases = [
+          "别灰心，多练习一定能进步 💪",
+          "这次没发挥好，再试一次吧 🌟",
+          "找到不足就是进步的开始 😊",
+          "继续努力，下次一定会更棒！🎉",
+          "加油！多听多练就能提高发音！👏"
+        ];
+      }
+      
+      const randomPhrase = phrases[Math.floor(Math.random()*phrases.length)];
+      
+      if (dojoText) {
+        encourageEl.textContent = `${randomPhrase} ${dojoText}`;
+      } else {
+        encourageEl.textContent = randomPhrase;
+      }
+
+      if (pct >= 60) {
+        showCelebrationAnimation(pct);
+      }
+    // 准备本轮词语数据
+  const modal = document.getElementById("result-word-modal");
+  const wordCountSpan = document.getElementById("this-round-word-count");
+  const listContainer = document.getElementById("result-word-list");
+  const showBtn = document.getElementById("show-this-round-words");
+  const closeBtns = document.querySelectorAll("#close-result-modal, #close-result-modal-btn");
+
+  // 填充数量
+  wordCountSpan.textContent = total;
+
+  // 清空旧内容
+  listContainer.innerHTML = "";
+
+  // 按游戏顺序填充词语（使用 order 数组保持原始出题顺序）
+  order.forEach((originalIndex, displayOrder) => {
+    const q = pool[originalIndex];
+    const isCorrect = wordCorrectStatus[displayOrder];  // 注意这里用的是显示顺序的索引
+
+    const item = document.createElement("div");
+    item.style.padding = "12px";
+    item.style.borderRadius = "10px";
+    item.style.background = "#f8f9fa";
+    item.style.textAlign = "center";
+    item.style.fontSize = "18px";
+    item.style.fontWeight = "bold";
+
+    // 根据对错设置颜色
+    if (isCorrect) {
+      item.style.color = "#2e7d32";           // 深绿
+      item.style.background = "#e8f5e9";
+    } else {
+      item.style.color = "#c62828";           // 深红
+      item.style.background = "#ffebee";
+    }
+
+    item.textContent = `${q.word} (${q.pinyin})`;
+
+    listContainer.appendChild(item);
+  });
+
+  // 点击按钮显示模态框
+  showBtn.onclick = () => {
+    modal.style.display = "flex";
+  };
+
+  // 关闭模态框（两种方式）
+  closeBtns.forEach(btn => {
+    btn.onclick = () => {
+      modal.style.display = "none";
+    };
+  });
+
+  // 点击背景关闭
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      modal.style.display = "none";
+    }
+  });
+}
+
+    function showCelebrationAnimation(percentage) {
+      const celebrationDiv = document.createElement("div");
+      celebrationDiv.className = "celebration";
+      document.body.appendChild(celebrationDiv);
+      
+      for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement("div");
+        confetti.className = "confetti";
+        confetti.style.left = Math.random() * 100 + "vw";
+        confetti.style.animationDuration = (Math.random() * 3 + 2) + "s";
+        confetti.style.animationDelay = Math.random() * 2 + "s";
+        celebrationDiv.appendChild(confetti);
+      }
+      
+      for (let i = 0; i < 10; i++) {
+        setTimeout(() => {
+          const firework = document.createElement("div");
+          firework.className = "firework";
+          firework.style.left = (Math.random() * 60 + 20) + "vw";
+          firework.style.top = (Math.random() * 60 + 20) + "vh";
+          firework.style.backgroundColor = [
+            "#FF6F61", "#FFB74D", "#4DB6AC", "#64B5F6", "#BA68C8"
+          ][Math.floor(Math.random() * 5)];
+          celebrationDiv.appendChild(firework);
+          
+          setTimeout(() => {
+            celebrationDiv.removeChild(firework);
+          }, 1000);
+        }, i * 300);
+      }
+      
+      const supermanCount = percentage >= 90 ? 3 : (percentage >= 70 ? 2 : 1);
+      for (let i = 0; i < supermanCount; i++) {
+        setTimeout(() => {
+          const superman = document.createElement("div");
+          superman.className = "superman";
+          superman.textContent = "🦸";
+          superman.style.top = (30 + i * 20) + '%';
+          document.body.appendChild(superman);
+          
+          setTimeout(() => {
+            if (superman.parentNode) {
+              document.body.removeChild(superman);
+            }
+          }, 3000);
+        }, i * 500);
+      }
+      
+      setTimeout(() => {
+        document.body.removeChild(celebrationDiv);
+      }, 5000);
+    }
+
+    quitBtn.addEventListener("click", ()=>{
+      if (confirm("确定要结束练习并返回首页吗？")) {
+        gameSection.style.display = "none";
+        homeSection.style.display = "block";
+      }
+    });
+
+    retryBtn.addEventListener("click", startGame);
+    backHomeBtn.addEventListener("click", ()=>{
+      endSection.style.display = "none";
+      homeSection.style.display = "block";
+    });
+
+    gradeBtns.forEach(btn => {
+      btn.addEventListener("click", ()=>{
+        gradeBtns.forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        selectedGrade = parseInt(btn.dataset.grade);
+        isCustomWords = false;
+      });
+    });
+
+    numBtns.forEach(btn => {
+      btn.addEventListener("click", ()=>{
+        numBtns.forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        selectedNum = btn.dataset.num;
+        customInput.value = "";
+        isCustomWords = false;
+      });
+    });
+
+    customInput.addEventListener("input", ()=>{
+      numBtns.forEach(b => b.classList.remove("selected"));
+      selectedNum = "custom";
+      customNum = parseInt(customInput.value) || 1;
+      isCustomWords = false;
+    });
+
+    startBtn.addEventListener("click", startGame);
+
+    // 词语选择弹窗相关
+    const wordModal = document.getElementById("word-modal");
+    const selectWordsBtn = document.getElementById("select-words");
+    const startCustomBtn = document.getElementById("start-custom");
+    const cancelModalBtn = document.getElementById("cancel-modal");
+    const gradeSections = document.getElementById("grade-sections");
+
+    selectWordsBtn.addEventListener("click", () => {
+      // 清空之前的内容
+      gradeSections.innerHTML = "";
+      selectedWords.clear();
+      
+      // 为每个年级创建词语选择区域
+      for (const grade in gradeWords) {
+        if (gradeWords[grade].length === 0) continue;
+        
+        const gradeSection = document.createElement("div");
+        gradeSection.className = "grade-section";
+        
+        const gradeHeader = document.createElement("div");
+        gradeHeader.className = "grade-header";
+        gradeHeader.innerHTML = `
+          <h3>${grade}年级词语</h3>
+          <button class="select-all-btn" data-grade="${grade}">全选/取消</button>
+        `;
+        gradeSection.appendChild(gradeHeader);
+        
+        const wordGrid = document.createElement("div");
+        wordGrid.className = "word-grid";
+        
+        // 添加该年级的所有词语
+        gradeWords[grade].forEach(wordData => {
+          const wordBtn = document.createElement("div");
+          wordBtn.className = "word-btn";
+          wordBtn.textContent = wordData.word;
+          wordBtn.dataset.word = wordData.word;
+          
+          wordBtn.addEventListener("click", () => {
+            wordBtn.classList.toggle("selected");
+            if (wordBtn.classList.contains("selected")) {
+              selectedWords.add(wordData.word);
+            } else {
+              selectedWords.delete(wordData.word);
+            }
+          });
+          
+          wordGrid.appendChild(wordBtn);
+        });
+        
+        gradeSection.appendChild(wordGrid);
+        gradeSections.appendChild(gradeSection);
+      }
+      
+      // 添加全选/取消功能
+      document.querySelectorAll(".select-all-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const grade = btn.dataset.grade;
+          const wordBtns = btn.closest(".grade-section").querySelectorAll(".word-btn");
+          const allSelected = Array.from(wordBtns).every(b => b.classList.contains("selected"));
+          
+          wordBtns.forEach(b => {
+            if (allSelected) {
+              b.classList.remove("selected");
+              selectedWords.delete(b.dataset.word);
+            } else {
+              b.classList.add("selected");
+              selectedWords.add(b.dataset.word);
+            }
+          });
+        });
+      });
+      
+      wordModal.style.display = "flex";
+    });
+
+    startCustomBtn.addEventListener("click", () => {
+      if (selectedWords.size === 0) {
+        alert("请至少选择一个词语");
+        return;
+      }
+      
+      isCustomWords = true;
+      wordModal.style.display = "none";
+      startGame();
+    });
+
+    cancelModalBtn.addEventListener("click", () => {
+      wordModal.style.display = "none";
+    });
+
+    // 点击模态框外部关闭
+    wordModal.addEventListener("click", (e) => {
+      if (e.target === wordModal) {
+        wordModal.style.display = "none";
+      }
+    });
+
+    // 初始化 - 默认选择四年级
+    document.querySelector(`.grade-btn[data-grade="4"]`).classList.add("selected");
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
