@@ -316,11 +316,11 @@
         <div class="card">
           <div style="font-weight:900">请选择年级</div>
           <div class="grade-selects" id="grade-selects">
-            <div class="grade-btn" data-grade="1">一年级<br><span style="font-size:13px;opacity:.9">33词</span></div>
-            <div class="grade-btn" data-grade="2">二年级<br><span style="font-size:13px;opacity:.9">45词</span></div>
-            <div class="grade-btn" data-grade="3">三年级<br><span style="font-size:13px;opacity:.9">64词</span></div>
-            <div class="grade-btn" data-grade="4">四年级<br><span style="font-size:13px;opacity:.9">64词</span></div>
-            <div class="grade-btn" data-grade="5">五年级<br><span style="font-size:13px;opacity:.9">77词</span></div>
+<div class="grade-btn" data-grade="1">一年级<br><span id="grade-count-1" style="font-size:13px;opacity:.9"></span></div>
+<div class="grade-btn" data-grade="2">二年级<br><span id="grade-count-2" style="font-size:13px;opacity:.9"></span></div>
+<div class="grade-btn" data-grade="3">三年级<br><span id="grade-count-3" style="font-size:13px;opacity:.9"></span></div>
+<div class="grade-btn" data-grade="4">四年级<br><span id="grade-count-4" style="font-size:13px;opacity:.9"></span></div>
+<div class="grade-btn" data-grade="5">五年级<br><span id="grade-count-5" style="font-size:13px;opacity:.9"></span></div>
           </div>
         </div>
 
@@ -1666,6 +1666,18 @@
 
     // 初始化 - 默认选择四年级
     document.querySelector(`.grade-btn[data-grade="4"]`).classList.add("selected");
+    // ✅ 新增：自动统计并显示每个年级的词语数量
+// 循环遍历所有年级（1到5年级）
+for (let grade = 1; grade <= 5; grade++) {
+  // 找到对应年级的 <span> 元素（我们在 HTML 中给它起了 id）
+  const countSpan = document.getElementById("grade-count-" + grade);
+  
+  // 检查：该年级是否有词语数据
+  if (countSpan && gradeWords[grade]) {
+    // 自动读取该年级词语数组的长度，填入 span 里显示
+    countSpan.textContent = gradeWords[grade].length + "词";
+  }
+}
   </script>
 </body>
 </html>
